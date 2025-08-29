@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard - Riverway Company Limited{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary-color: #1a202c;
+            --primary-light: #2d3748;
+            --secondary-color: #f56500;
+            --secondary-light: #ff7b00;
+            --success-color: #10b981;
+            --info-color: #3b82f6;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --accent-color: #8b5cf6;
+            --sidebar-width: 280px;
+            --gradient-primary: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            --gradient-secondary: linear-gradient(135deg, #f56500 0%, #ff7b00 100%);
+            --gradient-accent: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--gradient-primary);
+            padding-top: 24px;
+            overflow-y: auto;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1050;
+            box-shadow: var(--shadow-xl);
+            backdrop-filter: blur(20px);
+        }
+        
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20.5V18H14v-2h6.5v-2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18H26v2h-2.5v2.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .sidebar.show {
+            left: 0;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 14px 24px;
+            border-radius: var(--border-radius);
+            margin: 4px 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        
+        .sidebar .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 20px;
+            background: var(--gradient-secondary);
+            border-radius: 0 10px 10px 0;
+            transition: width 0.3s ease;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(8px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .sidebar .nav-link:hover::before,
+        .sidebar .nav-link.active::before {
+            width: 4px;
+        }
+        
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            margin-left: 0;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .navbar-toggler {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1060;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+        
+        .navbar-toggler:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
+        
+        .card {
+            border: none;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-secondary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            border: 2px solid #6c757d;
+            background: white;
+            color: #333;
+            border-radius: 15px;
+        }
+        
+        .stat-card.revenue {
+            border-color: #dc3545;
+        }
+        
+        .stat-card.orders {
+            border-color: #0dcaf0;
+        }
+        
+        .stat-card.products {
+            border-color: #198754;
+        }
+        
+        .stat-card h3 {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #d35400;
+            border-color: #d35400;
+        }
+        
+        .badge {
+            font-size: 0.8em;
+        }
+        
+        .sidebar-brand {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 800;
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .sidebar-brand i {
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-right: 12px;
+            font-size: 1.6rem;
+        }
+        
+        .logout-section {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .logout-section .nav-link {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        
+        .logout-section .nav-link:hover {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* Product and Category Cards */
+        .product-card, .category-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-color: #e9ecef !important;
+        }
+        
+        .product-card:hover, .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-color: #0d6efd !important;
+        }
+        
+        .hover-shadow {
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .hover-shadow:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .category-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #6f42c1, #8e44ad);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .bg-purple {
+            background-color: #6f42c1 !important;
+        }
+        
+        .text-purple {
+            color: #6f42c1 !important;
+        }
+        
+        .badge-sm {
+            font-size: 0.7em;
+            padding: 0.25em 0.5em;
+        }
+        
+        .progress-bar.bg-purple {
+            background-color: #6f42c1 !important;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+        
+        .object-fit-cover {
+            object-fit: cover;
+        }
+        
+        .min-width-0 {
+            min-width: 0;
+        }
+        
+        .quick-action-btn {
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        
+        @media (min-width: 992px) {
+            .sidebar {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-width);
+            }
+            
+            .navbar-toggler {
+                display: none;
+            }
+            
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px 10px;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Mobile navbar toggle -->
+    <button class="navbar-toggler" type="button" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+    </button>
+    
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-shop"></i>Riverway Admin
+        </div>
+        
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                   href="{% url 'admin_dashboard:home' %}">
+                    <i class="bi bi-speedometer2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'product' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'admin_dashboard:product_list' %}">
+                    <i class="bi bi-box"></i>Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'admin_dashboard:category_list' %}">
+                    <i class="bi bi-tags"></i>Categories
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'order' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'admin_dashboard:order_list' %}">
+                    <i class="bi bi-cart-check"></i>Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'chatbot_settings' %}active{% endif %}" 
+                   href="{% url 'admin_dashboard:chatbot_settings' %}">
+                    <i class="bi bi-robot"></i>Chatbot Settings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'chatbot_analytics' %}active{% endif %}" 
+                   href="{% url 'admin_dashboard:chatbot_analytics' %}">
+                    <i class="bi bi-graph-up"></i>Chatbot Analytics
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link" href="{% url 'store:home' %}" target="_blank">
+                    <i class="bi bi-arrow-up-right-square"></i>View Store
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">
+                    <i class="bi bi-gear"></i>Django Admin
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Logout section -->
+        <div class="logout-section">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <div class="nav-link text-light" style="pointer-events: none;">
+                        <i class="bi bi-person-circle"></i>{{ user.username|default:'Admin' }}
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'store:logout' %}">
+                        <i class="bi bi-box-arrow-right"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                sidebarOverlay.classList.toggle('show');
+            }
+            
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+            }
+            
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar);
+            
+            // Close sidebar when clicking on nav links on mobile
+            const navLinks = sidebar.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 992) {
+                        closeSidebar();
+                    }
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 992) {
+                    closeSidebar();
+                }
+            });
+
+            // Handle Django messages with SweetAlert2 toasts
+            {% if messages %}
+                {% for message in messages %}
+                    let icon = 'info';
+                    let messageType = '{{ message.tags }}';
+                    
+                    if (messageType.includes('success')) {
+                        icon = 'success';
+                    } else if (messageType.includes('error') || messageType.includes('danger')) {
+                        icon = 'error';
+                    } else if (messageType.includes('warning')) {
+                        icon = 'warning';
+                    }
+                    
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: icon,
+                        title: '{{ message|escapejs }}',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+
+        // Global function to show toasts from JavaScript
+        function showToast(message, type = 'success') {
+            let icon = type;
+            if (type === 'error') icon = 'error';
+            else if (type === 'warning') icon = 'warning';
+            else if (type === 'info') icon = 'info';
+            else icon = 'success';
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: message,
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+        }
+
+        // Global function to show confirmation dialogs
+        function showConfirmDialog(title, text, confirmButtonText = 'Yes, delete it!', callback) {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: confirmButtonText,
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed && callback) {
+                    callback();
+                }
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

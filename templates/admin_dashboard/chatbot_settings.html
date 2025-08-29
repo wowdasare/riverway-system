@@ -1,0 +1,521 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}Chatbot Settings - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-header {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #f56500;
+    }
+    
+    .settings-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+    
+    .settings-header h1 {
+        margin: 0;
+        font-size: 1.5rem; /* Reduced by 3px equivalent */
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .settings-header h1 i {
+        color: #f56500;
+    }
+    
+    .settings-card {
+        background: white;
+        border-radius: 15px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .settings-card:hover {
+        border-color: rgba(245, 101, 0, 0.2);
+        box-shadow: 0 8px 25px rgba(245, 101, 0, 0.15);
+    }
+    
+    .settings-card .card-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-bottom: 2px solid #f56500;
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    .settings-card .card-header h5 {
+        color: #f56500;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-label i {
+        margin-right: 0.5rem;
+        color: #f56500;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #f56500;
+        box-shadow: 0 0 0 0.2rem rgba(245, 101, 0, 0.1);
+        background: white;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #f56500 0%, #fd7e14 100%);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(245, 101, 0, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 101, 0, 0.4);
+        background: linear-gradient(135deg, #e55d00 0%, #f56d0f 100%);
+    }
+    
+    .faq-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table th {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 1rem;
+        border-bottom: 2px solid #f56500;
+    }
+    
+    .table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    
+    .table tbody tr:hover {
+        background: rgba(245, 101, 0, 0.05);
+    }
+    
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    
+    .badge.bg-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+    
+    .badge.bg-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h4 {
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #9ca3af;
+    }
+    
+    .form-check-input:checked {
+        background-color: #f56500;
+        border-color: #f56500;
+    }
+    
+    .form-check-label {
+        font-weight: 600;
+        color: #2d3748;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Settings Header -->
+<div class="settings-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1>
+                <i class="bi bi-robot me-2"></i>Chatbot Settings
+            </h1>
+            <p class="mb-0 opacity-90">
+                Configure your chatbot settings, FAQs, and company information
+            </p>
+        </div>
+        <a href="{% url 'admin_dashboard:chatbot_analytics' %}" class="btn btn-outline-light">
+            <i class="bi bi-graph-up"></i> View Analytics
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Company Information -->
+    <div class="col-md-6 mb-4">
+        <div class="card settings-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-building me-2"></i>Company Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_company_info">
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">
+                            <i class="bi bi-shop"></i>Company Name
+                        </label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ company_info.name|default:'Riverway Company Limited' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">
+                            <i class="bi bi-geo-alt"></i>Address
+                        </label>
+                        <textarea class="form-control" id="address" name="address" rows="2">{{ company_info.address|default:'' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">
+                            <i class="bi bi-telephone"></i>Phone
+                        </label>
+                        <input type="text" class="form-control" id="phone" name="phone" 
+                               value="{{ company_info.phone|default:'' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope"></i>Email
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="{{ company_info.email|default:'' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="website" class="form-label">
+                            <i class="bi bi-globe"></i>Website
+                        </label>
+                        <input type="url" class="form-control" id="website" name="website" 
+                               value="{{ company_info.website|default:'' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            <i class="bi bi-text-paragraph"></i>Description
+                        </label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ company_info.description|default:'' }}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Update Company Info
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add FAQ -->
+    <div class="col-md-6 mb-4">
+        <div class="card settings-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-question-circle me-2"></i>Add FAQ</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_faq">
+                    
+                    <div class="mb-3">
+                        <label for="question" class="form-label">
+                            <i class="bi bi-chat-quote"></i>Question
+                        </label>
+                        <input type="text" class="form-control" id="question" name="question" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="answer" class="form-label">
+                            <i class="bi bi-chat-text"></i>Answer
+                        </label>
+                        <textarea class="form-control" id="answer" name="answer" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">
+                            <i class="bi bi-tags"></i>Category
+                        </label>
+                        <input type="text" class="form-control" id="category" name="category" 
+                               placeholder="e.g., Products, Shipping, Returns">
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                            <label class="form-check-label" for="is_active">
+                                Active FAQ
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Add FAQ
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="showBulkAddModal()">
+                            <i class="bi bi-collection"></i> Add Defaults
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Statistics -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card settings-card">
+            <div class="card-body text-center">
+                <i class="bi bi-collection" style="font-size: 2rem; color: #f56500;"></i>
+                <h3 class="mt-2 mb-1">{{ total_faqs }}</h3>
+                <p class="text-muted mb-0">Total FAQs</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card settings-card">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle" style="font-size: 2rem; color: #10b981;"></i>
+                <h3 class="mt-2 mb-1">{{ active_faqs }}</h3>
+                <p class="text-muted mb-0">Active FAQs</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card settings-card">
+            <div class="card-body text-center">
+                <i class="bi bi-tags" style="font-size: 2rem; color: #8b5cf6;"></i>
+                <h3 class="mt-2 mb-1">{{ faq_categories.count }}</h3>
+                <p class="text-muted mb-0">Categories</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ List -->
+<div class="card faq-table">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Existing FAQs</h5>
+    </div>
+    <div class="card-body">
+        {% if faqs %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Answer</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faq in faqs %}
+                        <tr>
+                            <td>
+                                <strong>{{ faq.question|truncatechars:50 }}</strong>
+                                {% if faq.question|length > 50 %}
+                                <br><small class="text-muted" title="{{ faq.question }}">{{ faq.question|slice:":100" }}...</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ faq.answer|truncatechars:80 }}
+                                {% if faq.answer|length > 80 %}
+                                <br><small class="text-muted" title="{{ faq.answer }}">{{ faq.answer|slice:":150" }}...</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if faq.category %}
+                                    <span class="badge bg-secondary">{{ faq.category }}</span>
+                                {% else %}
+                                    <span class="text-muted">General</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if faq.is_active %}success{% else %}secondary{% endif %}">
+                                    {% if faq.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>{{ faq.created_at|date:"M j, Y" }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            onclick="toggleFAQ({{ faq.id }}, {{ faq.is_active|yesno:'true,false' }})"
+                                            title="{% if faq.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                        <i class="bi bi-{% if faq.is_active %}eye-slash{% else %}eye{% endif %}"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteFAQ({{ faq.id }}, '{{ faq.question|escapejs|truncatechars:30 }}')"
+                                            title="Delete FAQ">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-question-circle"></i>
+                <h4>No FAQs yet</h4>
+                <p>Add some frequently asked questions to help customers get instant answers and improve the chatbot's performance.</p>
+                <button class="btn btn-primary" onclick="document.getElementById('question').focus()">
+                    <i class="bi bi-plus-circle me-2"></i>Add Your First FAQ
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Bulk Add FAQs Modal -->
+<div class="modal fade" id="bulkAddModal" tabindex="-1" aria-labelledby="bulkAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkAddModalLabel">Add Default FAQs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will add 7 common FAQs for Riverway Company Limited including:</p>
+                <ul>
+                    <li>Product information and catalog</li>
+                    <li>Business hours and availability</li>
+                    <li>Order placement process</li>
+                    <li>Delivery services and areas</li>
+                    <li>Payment methods accepted</li>
+                    <li>Bulk pricing and discounts</li>
+                    <li>Product availability checking</li>
+                </ul>
+                <p class="text-muted"><strong>Note:</strong> Existing FAQs with similar questions will not be duplicated.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="bulk_add_faqs">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-collection"></i> Add Default FAQs
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden forms for actions -->
+<form id="toggleFAQForm" method="post" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="toggle_faq">
+    <input type="hidden" name="faq_id" id="toggleFAQId">
+</form>
+
+<form id="deleteFAQForm" method="post" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="delete_faq">
+    <input type="hidden" name="faq_id" id="deleteFAQId">
+</form>
+
+<script>
+// Show bulk add modal
+function showBulkAddModal() {
+    new bootstrap.Modal(document.getElementById('bulkAddModal')).show();
+}
+
+// Toggle FAQ active status
+function toggleFAQ(faqId, isActive) {
+    const action = isActive ? 'deactivate' : 'activate';
+    if (confirm(`Are you sure you want to ${action} this FAQ?`)) {
+        document.getElementById('toggleFAQId').value = faqId;
+        document.getElementById('toggleFAQForm').submit();
+    }
+}
+
+// Delete FAQ
+function deleteFAQ(faqId, question) {
+    if (confirm(`Are you sure you want to delete the FAQ: "${question}"?\n\nThis action cannot be undone.`)) {
+        document.getElementById('deleteFAQId').value = faqId;
+        document.getElementById('deleteFAQForm').submit();
+    }
+}
+
+// Auto-resize textarea
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('answer');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    }
+    
+    // Add tooltips to truncated content
+    document.querySelectorAll('[title]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,3073 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Riverway Company Limited{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary-color: #1a202c;
+            --primary-light: #2d3748;
+            --secondary-color: #f56500;
+            --secondary-light: #ff7b00;
+            --success-color: #10b981;
+            --info-color: #3b82f6;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --accent-color: #8b5cf6;
+            --gradient-primary: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            --gradient-secondary: linear-gradient(135deg, #f56500 0%, #ff7b00 100%);
+            --gradient-accent: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 12px;
+            --border-radius-lg: 4px;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #ffffff;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+            z-index: 1030;
+            position: relative;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--dark-color) !important;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background: var(--gradient-secondary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link:hover {
+            color: var(--secondary-color) !important;
+        }
+        
+        /* Navbar Dropdown Styles */
+        .navbar .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            background: white !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            border-radius: var(--border-radius) !important;
+            box-shadow: var(--shadow-lg) !important;
+            padding: 0.5rem 0 !important;
+            margin-top: 0.5rem !important;
+            min-width: 200px !important;
+            z-index: 9999 !important;
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            left: auto !important;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            color: var(--dark-color);
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .dropdown-divider {
+            margin: 0.5rem 1rem;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: var(--gradient-primary);
+            color: white !important;
+            padding: 120px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section * {
+            color: white !important;
+        }
+        
+        .hero-section .btn-outline-light {
+            border-color: white;
+            color: white;
+        }
+        
+        .hero-section .btn-outline-light:hover {
+            background-color: white;
+            color: var(--primary-color) !important;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        
+        /* Modern Button Styles */
+        .btn {
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            text-transform: none;
+            letter-spacing: 0.025em;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-secondary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:hover {
+            background: var(--gradient-secondary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+            background: transparent;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--gradient-secondary);
+            border-color: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-lg {
+            padding: 14px 32px;
+            font-size: 1.125rem;
+            border-radius: var(--border-radius-lg);
+        }
+        
+        /* Modern Card Styles */
+        .card {
+            border: none;
+            border-radius: var(--border-radius-lg);
+            background: white;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-secondary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .product-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .category-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-secondary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .category-card:hover::before {
+            opacity: 0.95;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .category-card > * {
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .category-card:hover > * {
+            color: white !important;
+        }
+        
+        .category-card:hover .btn-outline-primary {
+            background: white !important;
+            color: var(--secondary-color) !important;
+            border-color: white !important;
+        }
+        
+        /* Modern Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--primary-color);
+        }
+        
+        .display-4 {
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+        
+        .display-6 {
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        
+        .price {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 1.25rem;
+        }
+        
+        /* Images */
+        .product-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.1);
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            transition: transform 0.4s ease;
+        }
+        
+        .hero-image:hover {
+            transform: scale(1.03);
+        }
+        
+        /* Hero Slider Styles */
+        .hero-slider-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .hero-slider {
+            position: relative;
+            width: 100%;
+            height: 450px;
+        }
+        
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        
+        .hero-slide.active {
+            opacity: 1;
+        }
+        
+        .hero-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+        }
+        
+        .slide-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 40px 30px 20px;
+            text-align: left;
+        }
+        
+        .slide-caption h6 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        
+        .slide-caption p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .slider-nav {
+            display: none;
+        }
+        
+        .slider-indicators {
+            display: none;
+        }
+        
+        
+        /* Modern Footer */
+        .footer {
+            background: var(--gradient-primary);
+            color: white !important;
+            padding: 60px 0 30px;
+            position: relative;
+            margin-top: 80px;
+        }
+        
+        .footer * {
+            color: white !important;
+        }
+        
+        .footer h5 {
+            color: white !important;
+            font-weight: 700;
+        }
+        
+        .footer p {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20.5V18H14v-2h6.5v-2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18H26v2h-2.5v2.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5z'/%3E%3C/g%3E%3C/svg%3E");
+            background-repeat: repeat;
+            z-index: 0;
+        }
+        
+        .footer .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: var(--secondary-light);
+        }
+        
+        /* Section Styles */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-alt {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        /* Pagination Styles */
+        .pagination .page-link {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .pagination .page-link:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .pagination .page-item.active .page-link:hover {
+            background-color: var(--secondary-light);
+            border-color: var(--secondary-light);
+        }
+
+        /* List Group Styles */
+        .list-group-item-action.active {
+            background-color: var(--secondary-color) !important;
+            border-color: var(--secondary-color) !important;
+            color: white !important;
+        }
+        
+        .list-group-item-action:hover {
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+        }
+        
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+            border: none;
+            color: white;
+            font-size: 26px;
+            box-shadow: 0 8px 25px rgba(231, 126, 34, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1040;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 8px 25px rgba(231, 126, 34, 0.4), 0 0 0 0 rgba(231, 126, 34, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 8px 25px rgba(231, 126, 34, 0.4), 0 0 0 15px rgba(231, 126, 34, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 8px 25px rgba(231, 126, 34, 0.4), 0 0 0 0 rgba(231, 126, 34, 0);
+            }
+        }
+        
+        .chatbot-toggle:hover {
+            background: linear-gradient(135deg, #d35400, #b8611a);
+            transform: scale(1.1);
+            animation: none;
+            box-shadow: 0 12px 35px rgba(231, 126, 34, 0.6);
+        }
+        
+        .chatbot-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        .chatbot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .chatbot-overlay.show {
+            opacity: 1;
+        }
+
+        .chatbot-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 500px;
+            height: 100vh;
+            background: white;
+            border-radius: 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+            display: none;
+            z-index: 1050;
+            overflow: hidden;
+            animation: slideInFromRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            flex-direction: column;
+        }
+        
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+            color: white;
+            padding: 20px 25px 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 0;
+            flex-shrink: 0;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+        }
+        
+        .title-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .title-row i {
+            color: white !important;
+            font-size: 20px;
+        }
+        
+        .assistant-name {
+            color: white !important;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .subtitle-row {
+            margin-left: 30px;
+        }
+        
+        .ask-text {
+            color: white !important;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 0;
+        }
+        
+        .chatbot-input-area {
+            flex-shrink: 0;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .quick-suggestions {
+            flex-shrink: 0;
+            padding: 15px 20px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .suggestion-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+        
+        .suggestion-chip {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 1.5px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .suggestion-chip:hover {
+            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+            color: white;
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 126, 34, 0.3);
+        }
+        
+        .suggestion-chip i {
+            font-size: 12px;
+        }
+        
+        .talk-to-human-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #d35400) !important;
+            border-color: var(--secondary-color) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            box-shadow: 0 3px 10px rgba(231, 126, 34, 0.3);
+        }
+        
+        .talk-to-human-btn:hover {
+            background: linear-gradient(135deg, #d35400, #b8611a) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 126, 34, 0.4);
+        }
+        
+        .message {
+            display: flex;
+            margin-bottom: 0;
+            animation: messageSlideIn 0.3s ease-out;
+            align-items: flex-end;
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+            margin-left: 15%;
+        }
+        
+        .message.bot {
+            justify-content: flex-start;
+            margin-right: 15%;
+        }
+        
+        .message-bubble {
+            max-width: 100%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            position: relative;
+            word-break: break-word;
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+            color: white;
+            border-bottom-right-radius: 8px;
+            box-shadow: 0 3px 12px rgba(231, 126, 34, 0.4);
+            margin-left: auto;
+        }
+        
+        .bot-message {
+            background: white;
+            color: var(--dark-color);
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 8px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+        }
+        
+        .message-time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 6px;
+            text-align: right;
+        }
+        
+        .message.bot .message-time {
+            text-align: left;
+        }
+        
+        .typing-indicator {
+            display: none;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 20px;
+            border-bottom-left-radius: 8px;
+            padding: 14px 18px;
+            margin-right: 15%;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+            align-self: flex-start;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .typing-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            animation: typingBounce 1.4s ease-in-out infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingBounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-12px);
+                opacity: 1;
+            }
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        
+        .chatbot-input {
+            flex: 1;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 14px 20px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            resize: none;
+            min-height: 24px;
+            max-height: 100px;
+            line-height: 1.4;
+            font-family: inherit;
+        }
+        
+        .chatbot-input:focus {
+            border-color: var(--secondary-color);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(231, 126, 34, 0.1);
+        }
+        
+        .chatbot-input::placeholder {
+            color: #6c757d;
+            opacity: 0.8;
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(231, 126, 34, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(231, 126, 34, 0.4);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+        
+        .send-button:disabled {
+            background: linear-gradient(135deg, #ced4da, #adb5bd);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .send-button i {
+            font-size: 18px;
+        }
+        
+        /* Action buttons */
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary-color), #2c3e50);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(52, 73, 94, 0.2);
+            flex: 1;
+            justify-content: center;
+            max-width: 120px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 73, 94, 0.3);
+        }
+        
+        .action-btn.contact-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+        }
+        
+        .action-btn.contact-btn:hover {
+            box-shadow: 0 5px 15px rgba(231, 126, 34, 0.3);
+        }
+        
+        .action-btn i {
+            font-size: 14px;
+        }
+        
+        /* Contact Modal */
+        .contact-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .contact-modal {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            animation: modalSlideUp 0.3s ease-out forwards;
+        }
+        
+        @keyframes modalSlideUp {
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        .contact-modal-header {
+            padding: 25px 30px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color), #2c3e50);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .contact-modal-header h4 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .contact-modal-body {
+            padding: 30px;
+        }
+        
+        .contact-modal .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .contact-modal .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+        
+        .contact-modal .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            box-sizing: border-box;
+        }
+        
+        .contact-modal .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            background: white;
+            box-shadow: 0 0 0 0.2rem rgba(231, 126, 34, 0.25);
+        }
+        
+        .contact-modal textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        .contact-modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .contact-btn-submit {
+            flex: 1;
+            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 126, 34, 0.3);
+        }
+        
+        .contact-btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 126, 34, 0.4);
+        }
+        
+        .contact-btn-cancel {
+            flex: 1;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        /* Mobile responsive design for contact modal */
+        @media (max-width: 768px) {
+            .contact-modal {
+                width: 95%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            
+            .contact-modal-header {
+                padding: 20px 25px 15px;
+            }
+            
+            .contact-modal-header h4 {
+                font-size: 18px;
+            }
+            
+            .contact-modal-body {
+                padding: 20px;
+            }
+            
+            .contact-modal-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .action-btn {
+                font-size: 11px;
+                padding: 8px 12px;
+                max-width: 110px;
+            }
+            
+            .chatbot-actions {
+                margin-bottom: 12px !important;
+            }
+        }
+        
+        /* Custom scrollbar for chat messages */
+        .chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: rgba(231, 126, 34, 0.3);
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        .chatbot-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(231, 126, 34, 0.5);
+        }
+        
+        /* Firefox scrollbar */
+        .chatbot-messages {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(231, 126, 34, 0.3) transparent;
+        }
+        
+        /* Smooth scrolling */
+        .chatbot-messages {
+            scroll-behavior: smooth;
+        }
+
+        /* Feedback System Styles */
+        .feedback-section {
+            padding: 15px 20px;
+            background: #fff3cd;
+            border-top: 1px solid #e0e0e0;
+            display: none;
+        }
+
+        .feedback-section.show {
+            display: block;
+        }
+
+        .feedback-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .star {
+            color: #ddd;
+            cursor: pointer;
+            font-size: 20px;
+            transition: color 0.2s ease;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #ffc107;
+        }
+
+        .feedback-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 60px;
+            font-size: 12px;
+        }
+
+        .feedback-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .feedback-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .feedback-btn.primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .feedback-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            display: none !important; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .notification-badge.show {
+            display: flex !important; /* Only show when explicitly shown */
+        }
+        
+        .cart-badge {
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+        
+        .price {
+            font-weight: bold;
+            color: var(--secondary-color);
+            font-size: 1.2em;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 15px !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+            transition: transform 0.3s ease;
+        }
+        
+        .hero-image:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Enhanced Responsive Design */
+        @media (max-width: 1200px) {
+            .hero-section {
+                padding: 100px 0;
+            }
+            
+            .section {
+                padding: 60px 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 80px 0;
+                text-align: center;
+            }
+            
+            .hero-section h1 {
+                font-size: 2.5rem !important;
+                line-height: 1.1;
+            }
+            
+            .hero-image {
+                height: 300px;
+                margin-top: 30px;
+            }
+            
+            .category-card {
+                padding: 24px 20px;
+                text-align: center;
+            }
+            
+            .category-card h4 {
+                font-size: 1.2rem;
+            }
+            
+            .product-card {
+                margin-bottom: 1.5rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            
+            .display-4, .display-5 {
+                font-size: 2rem !important;
+            }
+            
+            .display-6 {
+                font-size: 1.5rem !important;
+            }
+            
+            .section {
+                padding: 50px 0;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem !important;
+            }
+            
+            .btn-lg {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+            
+            .category-card, 
+            .product-card {
+                margin-bottom: 1rem;
+            }
+            
+            .section {
+                padding: 40px 0;
+            }
+            
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {            
+            .chatbot-toggle {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 22px;
+            }
+            
+            .chatbot-container {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 100px);
+                right: 10px;
+                bottom: 80px;
+                border-radius: 0;
+            }
+            
+            .chatbot-header {
+                padding: 15px 20px 12px;
+                border-radius: 0;
+            }
+            
+            .assistant-name {
+                font-size: 16px;
+            }
+            
+            .ask-text {
+                font-size: 12px;
+            }
+            
+            .quick-suggestions {
+                padding: 12px 15px;
+            }
+            
+            .suggestion-chip {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+            
+            .chatbot-messages {
+                padding: 15px;
+                gap: 12px;
+            }
+            
+            .message.user {
+                margin-left: 5%;
+            }
+            
+            .message.bot {
+                margin-right: 5%;
+            }
+            
+            .message-bubble {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+            
+            .chatbot-input-area {
+                padding: 15px;
+            }
+            
+            .chatbot-input {
+                padding: 12px 18px;
+                font-size: 14px;
+            }
+            
+            .send-button {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .typing-indicator {
+                margin-right: 5%;
+            }
+            
+            .navbar-brand {
+                font-size: 1rem !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .btn-lg {
+                min-width: 100% !important;
+                margin-bottom: 10px;
+            }
+            
+            .d-flex.gap-3 {
+                flex-direction: column;
+            }
+            
+            .hero-image {
+                height: 250px;
+                border-radius: 10px !important;
+            }
+        }
+        
+        /* Animated Hero Title */
+        .animated-title {
+            animation: fadeInUp 1.2s ease-out, pulse 2s ease-in-out 1.5s infinite alternate;
+            transform: translateY(0);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.02);
+            }
+        }
+        
+        /* Auth Container Styles */
+        .auth-container {
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .auth-container .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .auth-header {
+            background: var(--gradient-primary);
+            color: white !important;
+            text-align: center;
+            padding: 40px 30px;
+            position: relative;
+        }
+        
+        .auth-header * {
+            color: white !important;
+        }
+        
+        .auth-header h2 {
+            color: white !important;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--secondary-color);
+            border-radius: 2px;
+        }
+        
+        .auth-body {
+            padding: 40px 30px 30px;
+        }
+        
+        .auth-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #d35400) !important;
+            border: none !important;
+            border-radius: 50px !important;
+            padding: 12px 30px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(231, 126, 34, 0.3) !important;
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(231, 126, 34, 0.4) !important;
+            background: linear-gradient(135deg, #d35400, #b8611a) !important;
+        }
+        
+        .auth-btn-outline {
+            border: 2px solid var(--secondary-color) !important;
+            color: var(--secondary-color) !important;
+            background: transparent !important;
+            border-radius: 50px !important;
+            padding: 10px 30px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .auth-btn-outline:hover {
+            background: var(--secondary-color) !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(231, 126, 34, 0.3) !important;
+        }
+        
+        .auth-container .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .auth-container .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(231, 126, 34, 0.25);
+            background-color: white;
+        }
+        
+        .auth-container .form-label {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .auth-header {
+                padding: 30px 20px;
+            }
+            
+            .auth-body {
+                padding: 30px 20px 20px;
+            }
+            
+            .auth-container {
+                padding: 20px 0;
+            }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            z-index: 9999 !important;
+        }
+        
+        .toast {
+            border: none !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+            backdrop-filter: blur(10px);
+            margin-bottom: 1rem;
+            min-width: 300px;
+            max-width: 400px;
+        }
+        
+        .toast-header {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 12px 16px;
+        }
+        
+        .toast-body {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-radius: 0 0 12px 12px !important;
+            font-weight: 500;
+            padding: 12px 16px;
+        }
+        
+        .toast.showing {
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        .toast.hide {
+            animation: slideOutRight 0.3s ease-in;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .toast-container {
+                top: 20px !important;
+                right: 10px !important;
+                left: 10px !important;
+                padding: 0 !important;
+            }
+            
+            .toast {
+                min-width: auto;
+                max-width: 100%;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'store:home' %}">
+                Riverway Company Limited
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'store:home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'store:product_list' %}">Products</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>{{ user.get_full_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'store:profile' %}"><i class="bi bi-person me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'store:order_history' %}"><i class="bi bi-bag me-2"></i>My Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'store:logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'store:login' %}">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'store:register' %}">
+                                <i class="bi bi-person-plus me-1"></i>Register
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'store:cart' %}">
+                            <i class="bi bi-cart"></i>
+                            <span class="cart-badge" id="cart-count">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+                    <div class="toast-header">
+                        {% if message.tags == 'success' %}
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong class="me-auto">Success</strong>
+                        {% elif message.tags == 'error' %}
+                            <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                            <strong class="me-auto">Error</strong>
+                        {% elif message.tags == 'warning' %}
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                            <strong class="me-auto">Warning</strong>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill text-info me-2"></i>
+                            <strong class="me-auto">Info</strong>
+                        {% endif %}
+                        <small class="text-muted">now</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main>
+        
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Riverway Company Limited</h5>
+                    <p>Since 2006, we've been a major player in hardware sales. Your One-Stop-Shop for hardware products, automotive supplies, paints, and lighting solutions.</p>
+                    <div class="mt-3">
+                        <small class="text-white-50">Serving: Accra • Kumasi • Tamale • Sunyani • Techiman</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5>Our Products</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-tools me-2"></i>Hardware Products</li>
+                        <li><i class="bi bi-car-front me-2"></i>Automotive Supplies</li>
+                        <li><i class="bi bi-paint-bucket me-2"></i>Paints & Coatings</li>
+                        <li><i class="bi bi-lightbulb me-2"></i>Lighting & Electrical</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Info</h5>
+                    <p class="text-white-50">
+                        <i class="bi bi-geo-alt me-2"></i> Fadama St, Accra New Fadema<br>
+                        <i class="bi bi-telephone me-2"></i> +233 55 845 9119<br>
+                        <i class="bi bi-envelope me-2"></i> info.riverwayco@gmail.com
+                    </p>
+                    <div class="mt-3">
+                        <h6>Business Hours</h6>
+                        <small class="text-white-50">Mon - Sat: 8:00 AM - 6:00 PM</small>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4">
+            <div class="text-center">
+                <p>&copy; 2025 Riverway Company Limited. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Enhanced Riverway Chatbot -->
+    <button class="chatbot-toggle" onclick="toggleChatbot()" title="Chat with Riverway Assistant">
+        <i class="bi bi-chat-dots"></i>
+        <div class="notification-badge" id="notificationBadge" style="display: none;">1</div>
+    </button>
+
+    <div class="chatbot-overlay" id="chatbot-overlay" onclick="toggleChatbot()"></div>
+
+    <div class="chatbot-container" id="chatbot">
+        <div class="chatbot-header">
+            <div class="header-content">
+                <div class="title-section">
+                    <div class="title-row">
+                        <i class="bi bi-robot"></i>
+                        <span class="assistant-name">Riverway Assistant</span>
+                    </div>
+                    <div class="subtitle-row">
+                        <span class="ask-text">Ask us anything</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-close btn-close-white" onclick="toggleChatbot()" title="Close chat"></button>
+        </div>
+        
+        
+        <div class="chatbot-messages" id="chat-messages">
+            <div class="message bot">
+                <div class="message-bubble bot-message">
+                    <div style="margin-bottom: 12px; line-height: 1.5;" id="initial-welcome">
+                        <strong>Welcome to Riverway Company!<br>How can I help you today?</strong>
+                    </div>
+{#                    <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 12px; border-radius: 12px; margin: 12px 0; border-left: 3px solid var(--secondary-color);">#}
+{#                        <div style="font-weight: 500; color: var(--primary-color); margin-bottom: 8px;">What I can help with:</div>#}
+{#                        <div style="display: grid; gap: 6px; font-size: 13px;">#}
+{#                            <div>🏗️ Product information & recommendations</div>#}
+{#                            <div>🕒 Business hours & contact details</div>#}
+{#                            <div>📦 Order status & shipping inquiries</div>#}
+{#                            <div>🔧 Technical support & specifications</div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div style="color: var(--secondary-color); font-weight: 500; text-align: center; padding: 8px 0;">#}
+{#                        How can I assist you today? 💬#}
+{#                    </div>#}
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typing-indicator">
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        
+        <!-- Contact Support Modal -->
+        <div class="contact-modal-overlay" id="contactModalOverlay" style="display: none;">
+            <div class="contact-modal">
+                <div class="contact-modal-header">
+                    <h4>Contact Human Support</h4>
+                    <button class="close-btn" onclick="hideContactForm()">&times;</button>
+                </div>
+                <div class="contact-modal-body">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="contactName">Full Name</label>
+                            <input type="text" id="contactName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactEmail">Email Address</label>
+                            <input type="email" id="contactEmail" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactPriority">Priority Level</label>
+                            <select id="contactPriority" class="form-control" required>
+                                <option value="">Select priority level</option>
+                                <option value="Low">Low - General inquiry</option>
+                                <option value="Medium">Medium - Standard support</option>
+                                <option value="High">High - Urgent issue</option>
+                                <option value="Critical">Critical - Business impact</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactDescription">Problem Description</label>
+                            <textarea id="contactDescription" class="form-control" rows="4" placeholder="Please describe your issue or inquiry in detail..." required></textarea>
+                        </div>
+                        
+                        <div class="contact-modal-buttons">
+                            <button type="submit" class="contact-btn-submit">Send Request</button>
+                            <button type="button" class="contact-btn-cancel" onclick="hideContactForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feedback Section -->
+        <div class="feedback-section" id="feedbackSection">
+            <div class="feedback-title">How was your experience?</div>
+            <div class="rating-stars" id="ratingStars">
+                <span class="star" data-rating="1">★</span>
+                <span class="star" data-rating="2">★</span>
+                <span class="star" data-rating="3">★</span>
+                <span class="star" data-rating="4">★</span>
+                <span class="star" data-rating="5">★</span>
+            </div>
+            <textarea class="feedback-input" id="feedbackInput" placeholder="Tell us about your experience (optional)"></textarea>
+            <div class="feedback-buttons">
+                <button class="feedback-btn primary" onclick="submitFeedback()">Submit</button>
+                <button class="feedback-btn secondary" onclick="hideFeedback()">Skip</button>
+            </div>
+        </div>
+
+        <div class="quick-suggestions">
+            <div class="suggestion-chips">
+                <div class="suggestion-chip talk-to-human-btn" onclick="talkToHuman()">
+                    <i class="bi bi-person-headset me-1"></i>
+                    Talk to human
+                </div>
+            </div>
+        </div>
+
+        <div class="chatbot-input-area">
+            <div class="input-group">
+                <input type="text" class="chatbot-input" id="chat-input" placeholder="Type your message..." maxlength="500">
+                <button class="send-button" id="send-btn" onclick="sendMessage()" title="Send message">
+                    <i class="bi bi-send"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add to cart functionality with AJAX
+        function addToCartAjax(productId, quantity = 1) {
+            const formData = new FormData();
+            formData.append('quantity', quantity);
+            formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+            
+            fetch(`/add-to-cart/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartCount(data.cart_total);
+                    showToast('Product added to cart!', 'success');
+                } else {
+                    showToast(data.error || 'Error adding product to cart', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error adding product to cart', 'error');
+            });
+        }
+        
+        // Update cart count badge
+        function updateCartCount(count) {
+            const cartBadge = document.getElementById('cart-count');
+            if (cartBadge) {
+                cartBadge.textContent = count;
+                cartBadge.style.display = count > 0 ? 'inline' : 'none';
+            }
+        }
+        
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) return;
+            
+            const toastId = 'toast_' + Date.now();
+            const iconMap = {
+                success: 'check-circle-fill text-success',
+                error: 'exclamation-triangle-fill text-danger',
+                warning: 'exclamation-triangle-fill text-warning',
+                info: 'info-circle-fill text-info'
+            };
+            
+            const toastHTML = `
+                <div class="toast" id="${toastId}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+                    <div class="toast-header">
+                        <i class="bi bi-${iconMap[type]} me-2"></i>
+                        <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                        <small class="text-muted">now</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+            
+            // Remove from DOM after hiding
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                toastElement.remove();
+            });
+        }
+        
+        // Initialize add to cart buttons and cart count
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize cart count
+            const cartBadge = document.getElementById('cart-count');
+            if (cartBadge) {
+                try {
+                    const cartCount = {{ cart.get_total_items|default:0 }};
+                    updateCartCount(cartCount);
+                } catch (e) {
+                    updateCartCount(0);
+                }
+            }
+            
+            // Add click handlers to add to cart buttons
+            const addToCartButtons = document.querySelectorAll('button[type="submit"]');
+            addToCartButtons.forEach(button => {
+                const form = button.closest('form');
+                if (form && form.action.includes('/add-to-cart/')) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const actionUrl = form.action;
+                        const productId = actionUrl.match(/add-to-cart\/(\d+)\//)[1];
+                        const quantityInput = form.querySelector('input[name="quantity"]');
+                        const quantity = quantityInput ? quantityInput.value : 1;
+                        
+                        // Disable button temporarily
+                        button.disabled = true;
+                        const originalText = button.innerHTML;
+                        button.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+                        
+                        addToCartAjax(productId, quantity);
+                        
+                        // Re-enable button after delay
+                        setTimeout(() => {
+                            button.disabled = false;
+                            button.innerHTML = originalText;
+                        }, 1000);
+                    });
+                }
+            });
+        });
+    </script>
+    <script>
+        let chatOpen = false;
+        let messageCount = 0;
+        let selectedRating = 0;
+        let sessionId = 'web_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        let hasNewMessages = false;
+        let nameCollected = false;
+        let hasShownNotification = sessionStorage.getItem('base_chatbot_notification_shown') === 'true';
+        
+        // Initialize session greeting status
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide initial welcome if user has already been greeted
+            if (sessionStorage.getItem('chatbot_greeted') === 'true') {
+                const welcomeElement = document.getElementById('initial-welcome');
+                if (welcomeElement) {
+                    welcomeElement.style.display = 'none';
+                }
+            }
+        });
+        
+        function toggleChatbot() {
+            const chatbot = document.getElementById('chatbot');
+            const overlay = document.getElementById('chatbot-overlay');
+            const toggle = document.querySelector('.chatbot-toggle');
+            const badge = document.getElementById('notificationBadge');
+            
+            if (chatOpen) {
+                chatbot.style.display = 'none';
+                overlay.style.display = 'none';
+                overlay.classList.remove('show');
+                toggle.style.display = 'block';
+                toggle.style.animation = 'pulse-ring 2s ease-out infinite';
+                document.body.style.overflow = 'auto';
+                chatOpen = false;
+            } else {
+                chatbot.style.display = 'flex';
+                overlay.style.display = 'block';
+                setTimeout(() => overlay.classList.add('show'), 10);
+                toggle.style.display = 'none';
+                toggle.style.animation = 'none';
+                badge.classList.remove('show');
+                document.body.style.overflow = 'hidden';
+                chatOpen = true;
+                hasNewMessages = false;
+                
+                // Reset notification state since user opened the chat
+                hasShownNotification = true;
+                sessionStorage.setItem('base_chatbot_notification_shown', 'true');
+                
+                // Mark greeting as shown
+                sessionStorage.setItem('chatbot_greeted', 'true');
+                
+                // Check if user is authenticated and show name form if needed
+                checkAndShowNameFormOnOpen();
+                
+                setTimeout(() => {
+                    const input = document.getElementById('chat-input');
+                    if (input) {
+                        input.focus();
+                    }
+                }, 100);
+            }
+        }
+        
+        function sendSuggestion(message) {
+            document.getElementById('chat-input').value = message;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const message = input.value.trim();
+            
+            if (!message || sendBtn.disabled) return;
+
+            // Disable send button
+            sendBtn.disabled = true;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            messageCount++;
+
+            // Show typing indicator
+            showTyping();
+
+            // Send to chatbot API
+            fetch('/chatbot/api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ 
+                    message: message,
+                    channel: 'website',
+                    session_id: sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideTyping();
+                
+                if (data.status === 'success') {
+                    // Add message with products if available
+                    addMessage(data.response, 'bot', false, data.products);
+                    
+                    // Check if bot is collecting name and show name collection form
+                    if (data.collecting_name || data.greeting_type === 'new_guest') {
+                        showMainChatbotNameForm();
+                    }
+                    
+                    // Update suggestions based on response
+                    if (data.suggested_actions && data.suggested_actions.length > 0) {
+                        updateSuggestions(data.suggested_actions);
+                    }
+                    
+                    if (data.escalated) {
+                        setTimeout(() => {
+                            addMessage('Your conversation has been forwarded to one of our team members who will assist you shortly.', 'bot', true);
+                        }, 1000);
+                    }
+                } else {
+                    addMessage(data.response || 'Sorry, I encountered an error. Please try again.', 'bot');
+                }
+            })
+            .catch(error => {
+                hideTyping();
+                addMessage('Sorry, I encountered a connection error. Please try again.', 'bot');
+            })
+            .finally(() => {
+                sendBtn.disabled = false;
+                input.focus();
+            });
+        }
+
+        function addMessage(message, type, isSystem = false, products = []) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const bubbleClass = isSystem ? 'bot-message' : (type === 'user' ? 'user-message' : 'bot-message');
+            
+            // Format message with markdown support
+            const formattedMessage = formatMessageWithMarkdown(message);
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble ${bubbleClass}">
+                    ${formattedMessage}
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            
+            // Add product display if products are provided
+            if (products && products.length > 0) {
+                const productContainer = createMainChatbotProductDisplay(products);
+                messagesContainer.appendChild(productContainer);
+            }
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function formatMessageWithMarkdown(content) {
+            // Convert markdown-style formatting to HTML
+            return content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold text
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')  // Italic text
+                .replace(/\n/g, '<br>')  // Line breaks
+                .replace(/• /g, '&bull; ')  // Bullet points
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--info-color); text-decoration: none;">$1</a>');  // Links
+        }
+
+        function createMainChatbotProductDisplay(products) {
+            const container = document.createElement('div');
+            container.className = 'message bot';
+            container.style.cssText = 'margin-top: 10px;';
+            
+            const productGrid = document.createElement('div');
+            productGrid.style.cssText = `
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 12px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 15px;
+                border: 1px solid #e9ecef;
+            `;
+            
+            products.slice(0, 4).forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.style.cssText = `
+                    background: white;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 12px;
+                    padding: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                `;
+                
+                let imageHtml = '';
+                if (product.image_url) {
+                    imageHtml = `
+                        <img src="${product.image_url}" alt="${product.name}" 
+                             style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                    `;
+                }
+                
+                const stockStatus = product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock';
+                const stockColor = product.stock_quantity > 0 ? 'var(--success-color)' : 'var(--danger-color)';
+                
+                productCard.innerHTML = `
+                    ${imageHtml}
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--primary-color); line-height: 1.3;">
+                        ${product.name}
+                    </div>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--secondary-color); margin-bottom: 6px;">
+                        ₵${parseFloat(product.price).toFixed(2)} <span style="font-size: 11px; font-weight: 400; color: #6c757d;">per ${product.unit}</span>
+                    </div>
+                    <div style="font-size: 12px; color: ${stockColor}; font-weight: 600;">
+                        ${stockStatus}
+                        ${product.stock_quantity > 0 ? ` (${product.stock_quantity} available)` : ''}
+                    </div>
+                `;
+                
+                productCard.addEventListener('click', () => {
+                    sendSuggestion(`Tell me more about ${product.name}`);
+                });
+                
+                productCard.addEventListener('mouseover', () => {
+                    productCard.style.transform = 'translateY(-2px)';
+                    productCard.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
+                });
+                
+                productCard.addEventListener('mouseout', () => {
+                    productCard.style.transform = 'translateY(0)';
+                    productCard.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                });
+                
+                productGrid.appendChild(productCard);
+            });
+            
+            container.appendChild(productGrid);
+            return container;
+        }
+        
+        function showTyping() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            typingIndicator.style.display = 'block';
+            messagesContainer.appendChild(typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function hideTyping() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            typingIndicator.style.display = 'none';
+        }
+        
+        function updateSuggestions(actions) {
+            // Keep the permanent "Talk to human" button and don't add other suggestions
+            // The "Talk to human" button is already in the HTML and should always be visible
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Handle Enter key in chat input
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('chat-input');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+                
+                // Auto-resize input as user types
+                input.addEventListener('input', function() {
+                    const sendBtn = document.getElementById('send-btn');
+                    sendBtn.style.opacity = this.value.trim() ? '1' : '0.6';
+                });
+            }
+        });
+        
+        // Feedback system functions
+        function showFeedback() {
+            const feedbackSection = document.getElementById('feedbackSection');
+            feedbackSection.classList.add('show');
+        }
+
+        function hideFeedback() {
+            const feedbackSection = document.getElementById('feedbackSection');
+            feedbackSection.classList.remove('show');
+        }
+
+        function showNotification() {
+            const badge = document.getElementById('notificationBadge');
+            const toggle = document.querySelector('.chatbot-toggle');
+            
+            if (!chatOpen && !hasShownNotification) {
+                badge.classList.add('show');
+                hasNewMessages = true;
+                hasShownNotification = true;
+                
+                // Mark notification as shown for this session
+                sessionStorage.setItem('base_chatbot_notification_shown', 'true');
+                
+                // Add pulse animation
+                toggle.style.animation = 'pulse-ring 1s infinite';
+            }
+        }
+
+        // Rating system
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    selectedRating = parseInt(this.dataset.rating);
+                    updateStars();
+                });
+                
+                star.addEventListener('mouseover', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    updateStars(rating);
+                });
+            });
+
+            const ratingStars = document.getElementById('ratingStars');
+            if (ratingStars) {
+                ratingStars.addEventListener('mouseleave', function() {
+                    updateStars(selectedRating);
+                });
+            }
+        });
+
+        function updateStars(rating = selectedRating) {
+            document.querySelectorAll('.star').forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        async function submitFeedback() {
+            const feedback = document.getElementById('feedbackInput').value;
+            
+            try {
+                const response = await fetch('/chatbot/feedback/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        rating: selectedRating,
+                        feedback: feedback,
+                        was_helpful: selectedRating >= 3
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    addMessage('Thank you for your feedback! 🙏', 'bot', true);
+                }
+            } catch (error) {
+                console.error('Feedback error:', error);
+            }
+            
+            hideFeedback();
+        }
+
+        function showMainChatbotNameForm() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const nameFormDiv = document.createElement('div');
+            nameFormDiv.id = 'mainChatbotNameForm';
+            nameFormDiv.className = 'message bot';
+            nameFormDiv.style.cssText = 'margin-top: 10px; margin-right: 15%;';
+            
+            nameFormDiv.innerHTML = `
+                <div class="message-bubble bot-message">
+                    <div style="margin-bottom: 15px; color: var(--primary-color); font-weight: 600;">
+                        <i class="bi bi-person-circle me-2"></i>May I have your name?
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                        <input type="text" id="mainGuestNameInput" placeholder="Enter your name" style="
+                            flex: 1;
+                            border: 2px solid var(--secondary-color);
+                            border-radius: 25px;
+                            padding: 10px 15px;
+                            font-size: 14px;
+                            outline: none;
+                            transition: border-color 0.3s ease;
+                        ">
+                        <button onclick="submitMainChatbotGuestName()" style="
+                            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+                            color: white;
+                            border: none;
+                            border-radius: 20px;
+                            padding: 10px 20px;
+                            font-size: 13px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: transform 0.2s ease;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <i class="bi bi-send me-1"></i>Send
+                        </button>
+                    </div>
+                    <div style="font-size: 11px; color: #6c757d; text-align: center;">
+                        <i class="bi bi-info-circle me-1"></i>This helps me personalize our conversation
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(nameFormDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Focus on the input
+            setTimeout(() => {
+                const nameInput = document.getElementById('mainGuestNameInput');
+                if (nameInput) {
+                    nameInput.focus();
+                    
+                    // Allow Enter key to submit
+                    nameInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            submitMainChatbotGuestName();
+                        }
+                    });
+                }
+            }, 100);
+        }
+
+        async function submitMainChatbotGuestName() {
+            const nameInput = document.getElementById('mainGuestNameInput');
+            const name = nameInput ? nameInput.value.trim() : '';
+            
+            if (!name) return;
+            
+            // Mark that we've collected the name for this session
+            nameCollected = true;
+            
+            // Remove the name collection form
+            const nameForm = document.getElementById('mainChatbotNameForm');
+            if (nameForm) {
+                nameForm.remove();
+            }
+            
+            // Add the name as a user message and send it
+            addMessage(name, 'user');
+            
+            // Show typing indicator
+            showTyping();
+            
+            try {
+                const response = await fetch('/chatbot/api/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        message: name,
+                        channel: 'website'
+                    })
+                });
+
+                const data = await response.json();
+                
+                hideTyping();
+
+                if (data.status === 'success') {
+                    addMessage(data.response, 'bot', false, data.products);
+                } else {
+                    addMessage(data.response || 'Sorry, I encountered an error. Please try again.', 'bot');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                hideTyping();
+                addMessage('Sorry, I encountered a connection error. Please try again.', 'bot');
+            }
+        }
+
+        function checkAndShowNameFormOnOpen() {
+            // Only ask for name if we haven't collected it yet this session
+            if (nameCollected) {
+                return;
+            }
+            
+            // Check if user is authenticated by making a quick API call
+            fetch('/chatbot/api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    message: 'hello',
+                    channel: 'website'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Clear the initial static welcome message and replace with dynamic response
+                    const messagesContainer = document.getElementById('chat-messages');
+                    // Remove the static welcome message
+                    const staticWelcome = messagesContainer.querySelector('.message.bot');
+                    if (staticWelcome) {
+                        staticWelcome.remove();
+                    }
+                    // Add the dynamic bot response
+                    addMessage(data.response, 'bot');
+                    
+                    // Only show name form if we haven't collected name AND bot is asking for it
+                    if (!nameCollected && (data.collecting_name || data.greeting_type === 'new_guest')) {
+                        setTimeout(() => {
+                            showMainChatbotNameForm();
+                        }, 500); // Small delay for better UX
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error checking authentication:', error);
+                // If there's an error, just show the regular interface
+            });
+        }
+
+        // Auto-show functionality has been disabled - chatbot opens only when clicked
+        
+        // Contextual chatbot functionality based on current page
+        function getPageContext() {
+            const path = window.location.pathname;
+            const currentPage = document.title;
+            
+            if (path.includes('/products/')) {
+                return {
+                    context: 'product_page',
+                    suggestions: [
+                        { text: 'Product Details', query: 'Tell me more about this product' },
+                        { text: 'Similar Products', query: 'Show me similar products' }
+                    ]
+                };
+            } else if (path.includes('/cart/')) {
+                return {
+                    context: 'cart_page',
+                    suggestions: [
+                        { text: 'Checkout Help', query: 'I need help with checkout' },
+                        { text: 'Shipping Info', query: 'What are the shipping options?' },
+                        { text: 'Payment Methods', query: 'What payment methods do you accept?' },
+                        { text: 'Delivery Time', query: 'When will my order arrive?' }
+                    ]
+                };
+            } else if (path.includes('/orders/')) {
+                return {
+                    context: 'orders_page',
+                    suggestions: [
+                        { text: 'Track Order', query: 'How can I track my order?' },
+                        { text: 'Order Status', query: 'What is the status of my order?' },
+                        { text: 'Modify Order', query: 'Can I modify my order?' },
+                        { text: 'Return Policy', query: 'What is your return policy?' }
+                    ]
+                };
+            } else if (path === '/' || path === '/home/') {
+                return {
+                    context: 'home_page',
+                    suggestions: []
+                };
+            }
+            
+            return {
+                context: 'general',
+                suggestions: []
+            };
+        }
+        
+        // Update suggestions based on page context
+        function updateContextualSuggestions() {
+            const context = getPageContext();
+            if (context.suggestions.length > 0) {
+                const suggestionsContainer = document.querySelector('.suggestion-chips');
+                
+                // Add contextual suggestions
+                context.suggestions.forEach(suggestion => {
+                    const chip = document.createElement('div');
+                    chip.className = 'suggestion-chip';
+                    chip.innerHTML = `<i class="bi bi-lightbulb me-1"></i>${suggestion.text}`;
+                    chip.onclick = () => sendSuggestion(suggestion.query);
+                    chip.style.background = 'linear-gradient(135deg, #e3f2fd, #bbdefb)';
+                    chip.style.borderColor = '#2196f3';
+                    chip.style.color = '#1976d2';
+                    suggestionsContainer.appendChild(chip);
+                });
+            }
+        }
+        
+        // Initialize contextual suggestions when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(updateContextualSuggestions, 500);
+        });
+
+        // Initialize toasts
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElements = document.querySelectorAll('.toast');
+            
+            toastElements.forEach(function(toastEl, index) {
+                // Add delay for multiple toasts to appear one after another
+                setTimeout(function() {
+                    toastEl.classList.add('showing');
+                    
+                    var toast = new bootstrap.Toast(toastEl, {
+                        autohide: true,
+                        delay: 5000
+                    });
+                    
+                    // Show the toast
+                    toast.show();
+                    
+                    // Handle toast hiding
+                    toastEl.addEventListener('hide.bs.toast', function() {
+                        toastEl.classList.add('hide');
+                    });
+                    
+                }, index * 200); // 200ms delay between each toast
+            });
+        });
+
+        // Contact Form Functions
+        function showContactForm() {
+            document.getElementById('contactModalOverlay').style.display = 'flex';
+            // Pre-fill user name if available
+            const userName = sessionStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('contactName').value = userName;
+            }
+        }
+
+        function hideContactForm() {
+            document.getElementById('contactModalOverlay').style.display = 'none';
+            document.getElementById('contactForm').reset();
+        }
+
+        function requestQuote() {
+            addMessage('I would like to request a quote for your products and services.', 'user');
+            setTimeout(() => {
+                sendMessage('quote request');
+            }, 300);
+        }
+
+        function talkToHuman() {
+            addMessage('I would like to speak with a human agent.', 'user');
+            setTimeout(() => {
+                addMessage('I\'ll connect you with our team. Please fill out this form and we\'ll get back to you shortly.', 'bot');
+                showContactForm();
+            }, 800);
+        }
+        
+        function showContactForm() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const contactFormDiv = document.createElement('div');
+            contactFormDiv.className = 'message bot';
+            contactFormDiv.style.cssText = 'margin-top: 10px; margin-right: 15%;';
+            
+            contactFormDiv.innerHTML = `
+                <div class="message-bubble bot-message">
+                    <div style="margin-bottom: 15px; color: var(--primary-color); font-weight: 600;">
+                        <i class="bi bi-person-headset me-2"></i>Contact Our Team
+                    </div>
+                    <form id="chatContactForm" style="display: flex; flex-direction: column; gap: 12px;">
+                        <input type="text" id="chatContactName" placeholder="Your Name" style="
+                            border: 2px solid var(--secondary-color);
+                            border-radius: 8px;
+                            padding: 8px 12px;
+                            font-size: 14px;
+                            outline: none;
+                        " required>
+                        <input type="email" id="chatContactEmail" placeholder="Your Email" style="
+                            border: 2px solid var(--secondary-color);
+                            border-radius: 8px;
+                            padding: 8px 12px;
+                            font-size: 14px;
+                            outline: none;
+                        " required>
+                        <select id="chatContactPriority" style="
+                            border: 2px solid var(--secondary-color);
+                            border-radius: 8px;
+                            padding: 8px 12px;
+                            font-size: 14px;
+                            outline: none;
+                        " required>
+                            <option value="">Select Priority</option>
+                            <option value="Low">Low - General Inquiry</option>
+                            <option value="Medium">Medium - Product Question</option>
+                            <option value="High">High - Order Issue</option>
+                            <option value="Urgent">Urgent - Problem</option>
+                        </select>
+                        <textarea id="chatContactMessage" placeholder="Describe your inquiry..." rows="3" style="
+                            border: 2px solid var(--secondary-color);
+                            border-radius: 8px;
+                            padding: 8px 12px;
+                            font-size: 14px;
+                            outline: none;
+                            resize: vertical;
+                        " required></textarea>
+                        <button type="submit" style="
+                            background: linear-gradient(135deg, var(--secondary-color), #d35400);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            padding: 10px 20px;
+                            font-size: 14px;
+                            font-weight: 600;
+                            cursor: pointer;
+                        ">
+                            <i class="bi bi-send me-1"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(contactFormDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Handle form submission
+            const form = contactFormDiv.querySelector('#chatContactForm');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('chatContactName').value;
+                const email = document.getElementById('chatContactEmail').value;
+                const priority = document.getElementById('chatContactPriority').value;
+                const message = document.getElementById('chatContactMessage').value;
+                
+                // Submit the form
+                try {
+                    const response = await fetch('/chatbot/contact-support/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            priority: priority,
+                            description: message,
+                            source: 'chatbot'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        contactFormDiv.remove();
+                        addMessage('Thank you! Your message has been sent to our team. We\'ll get back to you soon!', 'bot');
+                    } else {
+                        addMessage('Sorry, there was an error sending your message. Please try again.', 'bot');
+                    }
+                } catch (error) {
+                    addMessage('Sorry, there was a connection error. Please try again.', 'bot');
+                }
+            });
+        }
+
+        // Handle contact form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const submitBtn = document.querySelector('.contact-btn-submit');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Sending...';
+                    submitBtn.disabled = true;
+
+                    const formData = {
+                        name: document.getElementById('contactName').value,
+                        email: document.getElementById('contactEmail').value,
+                        priority: document.getElementById('contactPriority').value,
+                        description: document.getElementById('contactDescription').value
+                    };
+
+                    try {
+                        const response = await fetch('/chatbot/contact-support/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        if (response.ok) {
+                            hideContactForm();
+                            addMessage('Thank you! Your support request has been sent. Our team will contact you within 24 hours.', 'bot');
+                        } else {
+                            alert('There was an error sending your request. Please try again.');
+                        }
+                    } catch (error) {
+                        alert('There was an error sending your request. Please try again.');
+                    } finally {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+
+            // Close modal when clicking outside
+            document.getElementById('contactModalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideContactForm();
+                }
+            });
+        });
+    </script>
+    
+    <!-- Hero Slider JavaScript -->
+    <script>
+        // Hero Slider Functionality
+        let currentSlideIndex = 0;
+        let slideInterval;
+
+        function initializeSlider() {
+            const slides = document.querySelectorAll('.hero-slide');
+            const indicators = document.querySelectorAll('.indicator');
+            
+            if (slides.length === 0) return;
+            
+            // Start auto-slide
+            startAutoSlide();
+            
+            // Pause on hover
+            const sliderContainer = document.querySelector('.hero-slider-container');
+            if (sliderContainer) {
+                sliderContainer.addEventListener('mouseenter', stopAutoSlide);
+                sliderContainer.addEventListener('mouseleave', startAutoSlide);
+            }
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.hero-slide');
+            const indicators = document.querySelectorAll('.indicator');
+            
+            if (slides.length === 0) return;
+            
+            // Remove active class from current slide and indicator
+            slides[currentSlideIndex].classList.remove('active');
+            indicators[currentSlideIndex].classList.remove('active');
+            
+            // Calculate next slide index
+            currentSlideIndex += direction;
+            
+            if (currentSlideIndex >= slides.length) {
+                currentSlideIndex = 0;
+            } else if (currentSlideIndex < 0) {
+                currentSlideIndex = slides.length - 1;
+            }
+            
+            // Add active class to new slide and indicator
+            slides[currentSlideIndex].classList.add('active');
+            indicators[currentSlideIndex].classList.add('active');
+        }
+
+        function currentSlide(slideIndex) {
+            const slides = document.querySelectorAll('.hero-slide');
+            const indicators = document.querySelectorAll('.indicator');
+            
+            if (slides.length === 0) return;
+            
+            // Remove active class from current slide and indicator
+            slides[currentSlideIndex].classList.remove('active');
+            indicators[currentSlideIndex].classList.remove('active');
+            
+            // Set new slide index (subtract 1 because slideIndex is 1-based)
+            currentSlideIndex = slideIndex - 1;
+            
+            // Add active class to new slide and indicator
+            slides[currentSlideIndex].classList.add('active');
+            indicators[currentSlideIndex].classList.add('active');
+            
+            // Restart auto-slide
+            stopAutoSlide();
+            startAutoSlide();
+        }
+
+        function startAutoSlide() {
+            slideInterval = setInterval(function() {
+                changeSlide(1);
+            }, 10000); // Change slide every 10 seconds
+        }
+
+        function stopAutoSlide() {
+            if (slideInterval) {
+                clearInterval(slideInterval);
+            }
+        }
+
+        // Initialize slider when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSlider();
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

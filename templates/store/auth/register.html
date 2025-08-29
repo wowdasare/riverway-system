@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Riverway Company Limited{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container py-4 mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7 col-sm-9">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Create Account
+                        </h3>
+                        <p class="mb-0 opacity-90">Join Riverway for a better shopping experience</p>
+                    </div>
+                    <div class="auth-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label fw-bold text-dark">
+                                        <i class="bi bi-person me-2"></i>First Name
+                                    </label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.first_name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label fw-bold text-dark">
+                                        <i class="bi bi-person me-2"></i>Last Name
+                                    </label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.last_name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.username.id_for_label }}" class="form-label fw-bold text-dark">
+                                    <i class="bi bi-at me-2"></i>Username
+                                </label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.username.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.email.id_for_label }}" class="form-label fw-bold text-dark">
+                                    <i class="bi bi-envelope me-2"></i>Email Address
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.email.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="{{ form.password1.id_for_label }}" class="form-label fw-bold text-dark">
+                                        <i class="bi bi-lock me-2"></i>Password
+                                    </label>
+                                    {{ form.password1 }}
+                                    {% if form.password1.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.password1.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label for="{{ form.password2.id_for_label }}" class="form-label fw-bold text-dark">
+                                        <i class="bi bi-lock-fill me-2"></i>Confirm Password
+                                    </label>
+                                    {{ form.password2 }}
+                                    {% if form.password2.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.password2.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-4">
+                                <button type="submit" class="btn btn-primary btn-lg auth-btn">
+                                    <i class="bi bi-person-check me-2"></i>Create Account
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="text-center">
+                            <p class="text-muted mb-3">Already have an account?</p>
+                            <a href="{% url 'store:login' %}" class="btn btn-outline-primary auth-btn-outline">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                            </a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Registration Benefits Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <i class="bi bi-speedometer2" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                </div>
+                <h5>Fast Checkout</h5>
+                <p class="text-muted">Save your details for quicker future purchases</p>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <i class="bi bi-clock-history" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                </div>
+                <h5>Order History</h5>
+                <p class="text-muted">Track all your past orders and reorder easily</p>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <i class="bi bi-heart" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                </div>
+                <h5>Personalized Experience</h5>
+                <p class="text-muted">Get product recommendations tailored to you</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

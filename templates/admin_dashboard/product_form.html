@@ -1,0 +1,584 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}{% if product %}Edit Product{% else %}Add Product{% endif %} - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-form-container {
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(245, 101, 0, 0.1);
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #f56500;
+    }
+    
+    .form-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+    
+    .form-header h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .form-header h1 i {
+        color: #f56500;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .form-section:hover {
+        border-color: rgba(245, 101, 0, 0.2);
+        box-shadow: 0 5px 15px rgba(245, 101, 0, 0.1);
+    }
+    
+    .form-section-title {
+        color: #1a202c;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f56500;
+        display: inline-block;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-label i {
+        margin-right: 0.5rem;
+        color: #f56500;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #f56500;
+        box-shadow: 0 0 0 0.2rem rgba(245, 101, 0, 0.1);
+        background: white;
+    }
+    
+    .image-upload-area {
+        border: 2px dashed #cbd5e0;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .image-upload-area:hover {
+        border-color: #f56500;
+        background: linear-gradient(135deg, rgba(245, 101, 0, 0.05) 0%, rgba(253, 126, 20, 0.05) 100%);
+    }
+    
+    .image-upload-area.has-image {
+        border-color: #48bb78;
+        background: linear-gradient(135deg, rgba(72, 187, 120, 0.05) 0%, rgba(56, 178, 172, 0.05) 100%);
+    }
+    
+    .image-preview {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        border: 3px solid white;
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: #a0aec0;
+        margin-bottom: 1rem;
+    }
+    
+    .has-image .upload-icon {
+        color: #48bb78;
+    }
+    
+    .stock-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+    
+    .stock-high {
+        background: linear-gradient(135deg, #48bb78 0%, #38b2ac 100%);
+        color: white;
+    }
+    
+    .stock-medium {
+        background: linear-gradient(135deg, #ed8936 0%, #f56500 100%);
+        color: white;
+    }
+    
+    .stock-low {
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        color: white;
+    }
+    
+    .action-buttons {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border-top: 4px solid #f56500;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #f56500 0%, #fd7e14 100%);
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(245, 101, 0, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(245, 101, 0, 0.4);
+        background: linear-gradient(135deg, #e55d00 0%, #f56d0f 100%);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+        transform: translateY(-1px);
+        color: white;
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        padding: 0.5rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .form-check-input:checked {
+        background-color: #f56500;
+        border-color: #f56500;
+    }
+    
+    .form-check-label {
+        font-weight: 600;
+        color: #2d3748;
+    }
+    
+    .active-toggle {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        border: 2px solid #f56500;
+        transition: all 0.3s ease;
+    }
+    
+    .active-toggle:hover {
+        border-color: #fd7e14;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(245, 101, 0, 0.2);
+    }
+    
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .breadcrumb-item {
+        color: #718096;
+    }
+    
+    .breadcrumb-item.active {
+        color: #f56500;
+        font-weight: 600;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        color: #cbd5e0;
+        content: "→";
+    }
+    
+    .price-input {
+        position: relative;
+    }
+    
+    .price-input::before {
+        content: "₵";
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #f56500;
+        font-weight: bold;
+        z-index: 10;
+    }
+    
+    .price-input input {
+        padding-left: 2.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .product-form-container {
+            padding: 1rem;
+        }
+        
+        .form-header {
+            padding: 1rem 1.5rem;
+        }
+        
+        .form-section {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_dashboard:home' %}" class="text-decoration-none">
+                <i class="bi bi-house-door"></i> Dashboard
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_dashboard:product_list' %}" class="text-decoration-none">Products</a>
+        </li>
+        <li class="breadcrumb-item active">{% if product %}Edit Product{% else %}Add Product{% endif %}</li>
+    </ol>
+</nav>
+
+<div class="product-form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <div class="text-center">
+            <h1>
+                <i class="bi bi-{% if product %}pencil-square{% else %}plus-circle{% endif %} me-2"></i>
+                {% if product %}Edit Product{% else %}Add New Product{% endif %}
+            </h1>
+            <p class="mb-0 opacity-90">
+                {% if product %}Update product information and details{% else %}Create a new product for your inventory{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Basic Information Section -->
+        <div class="form-section">
+            <h3 class="form-section-title">
+                <i class="bi bi-info-circle me-2"></i>Basic Information
+            </h3>
+            
+            <div class="row">
+                <div class="col-lg-8 mb-3">
+                    <label for="name" class="form-label">
+                        <i class="bi bi-tag"></i>Product Name
+                    </label>
+                    <input type="text" class="form-control" id="name" name="name" 
+                           value="{{ product.name|default:'' }}" required
+                           placeholder="Enter product name">
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <label for="sku" class="form-label">
+                        <i class="bi bi-upc-scan"></i>SKU Code
+                    </label>
+                    <input type="text" class="form-control" id="sku" name="sku" 
+                           value="{{ product.sku|default:'' }}" required
+                           placeholder="e.g., PRD-001">
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="description" class="form-label">
+                    <i class="bi bi-text-paragraph"></i>Product Description
+                </label>
+                <textarea class="form-control" id="description" name="description" rows="4"
+                          placeholder="Provide a detailed description of the product">{{ product.description|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Pricing & Category Section -->
+        <div class="form-section">
+            <h3 class="form-section-title">
+                <i class="bi bi-currency-dollar me-2"></i>Pricing & Category
+            </h3>
+            
+            <div class="row">
+                <div class="col-lg-4 mb-3">
+                    <label for="category" class="form-label">
+                        <i class="bi bi-grid-3x3-gap"></i>Category
+                    </label>
+                    <select class="form-select" id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" 
+                                    {% if product.category.id == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <label for="price" class="form-label">
+                        <i class="bi bi-cash"></i>Price (₵)
+                    </label>
+                    <div class="price-input">
+                        <input type="number" step="0.01" class="form-control" id="price" name="price" 
+                               value="{{ product.price|default:'' }}" required
+                               placeholder="0.00">
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <label for="unit" class="form-label">
+                        <i class="bi bi-rulers"></i>Unit of Measure
+                    </label>
+                    <select class="form-select" id="unit" name="unit" required>
+                        <option value="piece" {% if product.unit == 'piece' %}selected{% endif %}>Piece</option>
+                        <option value="box" {% if product.unit == 'box' %}selected{% endif %}>Box</option>
+                        <option value="bag" {% if product.unit == 'bag' %}selected{% endif %}>Bag</option>
+                        <option value="meter" {% if product.unit == 'meter' %}selected{% endif %}>Meter</option>
+                        <option value="kg" {% if product.unit == 'kg' %}selected{% endif %}>Kilogram</option>
+                        <option value="liter" {% if product.unit == 'liter' %}selected{% endif %}>Liter</option>
+                        <option value="gallon" {% if product.unit == 'gallon' %}selected{% endif %}>Gallon</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory & Image Section -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="bi bi-boxes me-2"></i>Inventory Management
+                    </h3>
+                    
+                    <div class="mb-3">
+                        <label for="stock_quantity" class="form-label">
+                            <i class="bi bi-stack"></i>Stock Quantity
+                        </label>
+                        <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" 
+                               value="{{ product.stock_quantity|default:'0' }}" required min="0"
+                               placeholder="Enter stock quantity" onchange="updateStockStatus(this.value)">
+                        <div id="stock-status" class="stock-status mt-2"></div>
+                    </div>
+                    
+                    <div class="active-toggle">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                   {% if not product or product.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                <i class="bi bi-toggle-on me-2"></i>Active Product
+                            </label>
+                            <div class="mt-2">
+                                <small class="text-light opacity-90">
+                                    Active products are visible to customers and available for purchase
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="bi bi-image me-2"></i>Product Image
+                    </h3>
+                    
+                    <div class="image-upload-area" id="image-upload-area">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="image-preview" id="image-preview">
+                        {% endif %}
+                        <div class="upload-icon" id="upload-icon">
+                            <i class="bi bi-cloud-upload"></i>
+                        </div>
+                        <h5 class="mb-2">Upload Product Image</h5>
+                        <p class="text-muted mb-3">
+                            Drag and drop an image here, or click to browse
+                        </p>
+                        <input type="file" class="form-control" id="image" name="image" 
+                               accept="image/*" style="display: none;" onchange="previewImage(this)">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('image').click()">
+                            <i class="bi bi-folder2-open me-2"></i>Choose File
+                        </button>
+                        {% if product.image %}
+                            <div class="mt-2">
+                                <small class="text-success">
+                                    <i class="bi bi-check-circle me-1"></i>Current: {{ product.image.name }}
+                                </small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary me-3">
+                    <i class="bi bi-check-circle me-2"></i>
+                    {% if product %}Update Product{% else %}Create Product{% endif %}
+                </button>
+                <a href="{% url 'admin_dashboard:product_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </a>
+                {% if product %}
+                    <a href="{% url 'store:product_detail' product.id %}" 
+                       class="btn btn-outline-secondary ms-3" target="_blank">
+                        <i class="bi bi-eye me-2"></i>View on Store
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Preview uploaded image
+function previewImage(input) {
+    const uploadArea = document.getElementById('image-upload-area');
+    const preview = document.getElementById('image-preview');
+    const uploadIcon = document.getElementById('upload-icon');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            if (preview) {
+                preview.src = e.target.result;
+            } else {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'image-preview';
+                img.id = 'image-preview';
+                uploadArea.insertBefore(img, uploadIcon);
+            }
+            uploadArea.classList.add('has-image');
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Update stock status indicator
+function updateStockStatus(quantity) {
+    const statusDiv = document.getElementById('stock-status');
+    const qty = parseInt(quantity);
+    
+    if (qty > 20) {
+        statusDiv.className = 'stock-status stock-high';
+        statusDiv.innerHTML = '<i class="bi bi-check-circle me-2"></i>Well Stocked';
+    } else if (qty > 10) {
+        statusDiv.className = 'stock-status stock-medium';
+        statusDiv.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>Medium Stock';
+    } else if (qty > 0) {
+        statusDiv.className = 'stock-status stock-low';
+        statusDiv.innerHTML = '<i class="bi bi-exclamation-diamond me-2"></i>Low Stock';
+    } else {
+        statusDiv.className = 'stock-status stock-low';
+        statusDiv.innerHTML = '<i class="bi bi-x-circle me-2"></i>Out of Stock';
+    }
+}
+
+// Initialize stock status on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const stockInput = document.getElementById('stock_quantity');
+    if (stockInput.value) {
+        updateStockStatus(stockInput.value);
+    }
+    
+    // Make upload area clickable, but prevent double-clicking
+    const uploadArea = document.getElementById('image-upload-area');
+    const fileInput = document.getElementById('image');
+    
+    // Make upload area clickable, but exclude buttons, input, and images
+    uploadArea.addEventListener('click', function(e) {
+        // Don't trigger if clicking on button, input, image, or small elements
+        if (e.target.tagName === 'BUTTON' || 
+            e.target.tagName === 'INPUT' || 
+            e.target.tagName === 'IMG' ||
+            e.target.tagName === 'I' ||
+            e.target.tagName === 'SMALL' ||
+            e.target.closest('button') ||
+            e.target.closest('small')) {
+            return;
+        }
+        fileInput.click();
+    });
+});
+</script>
+{% endblock %}

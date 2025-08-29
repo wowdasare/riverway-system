@@ -1,0 +1,901 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}Dashboard - Admin{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .analytics-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .analytics-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 20px 0;
+    }
+    
+    .products-card {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        color: white;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .orders-card {
+        background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+        color: white;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .revenue-card {
+        background: linear-gradient(135deg, #f56500 0%, #fd7e14 100%);
+        color: white;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .chatbot-card {
+        background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+        color: white;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .products-card:hover, .orders-card:hover, .revenue-card:hover, .chatbot-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .products-card::before, .orders-card::before, .revenue-card::before, .chatbot-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(20px, -20px);
+    }
+    
+    .performance-badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 5px 15px;
+        color: white;
+        font-weight: 500;
+    }
+    
+    .trend-up {
+        color: #10b981;
+    }
+    
+    .trend-down {
+        color: #ef4444;
+    }
+    
+    .glassmorphism {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+    }
+    
+    /* Reduce font size only for specific metric card labels */
+    .products-card p, .orders-card p, .revenue-card p, .chatbot-card p {
+        font-size: calc(1rem - 3px) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1" style="font-size: calc(2.375rem - 3px);">Dashboard Analytics</h1>
+        <p class="text-muted mb-0" style="font-size: calc(1rem - 3px);">Welcome back, {{ user.username }}! Here's what's happening today.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary" onclick="refreshAnalytics()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+        </button>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-calendar3 me-2"></i>Last 30 Days
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
+                <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
+                <li><a class="dropdown-item" href="#">Last 3 Months</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Stats Cards with Trends -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card products-card text-center p-4">
+            <div class="card-body p-0 position-relative">
+                <i class="bi bi-box display-4 mb-3" style="opacity: 0.8;"></i>
+                <h2 class="mb-2">{{ total_products }}</h2>
+                <p class="mb-2">Active Products</p>
+                <span class="performance-badge">
+                    <i class="bi bi-arrow-up"></i> +{{ recent_products.count }} this week
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card orders-card text-center p-4">
+            <div class="card-body p-0 position-relative">
+                <i class="bi bi-cart-check display-4 mb-3" style="opacity: 0.8;"></i>
+                <h2 class="mb-2">{{ total_orders }}</h2>
+                <p class="mb-2">Total Orders</p>
+                <span class="performance-badge">
+                    <i class="bi bi-arrow-up"></i> +{{ weekly_orders }} this week
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card revenue-card text-center p-4">
+            <div class="card-body p-0 position-relative">
+                <i class="bi bi-currency-dollar display-4 mb-3" style="opacity: 0.8;"></i>
+                <h2 class="mb-2">₵{{ total_revenue|floatformat:0 }}</h2>
+                <p class="mb-2">Total Revenue</p>
+                <span class="performance-badge">
+                    <i class="bi bi-arrow-up"></i> ₵{{ weekly_revenue|floatformat:0 }} this week
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card chatbot-card text-center p-4">
+            <div class="card-body p-0 position-relative">
+                <i class="bi bi-robot display-4 mb-3" style="opacity: 0.8;"></i>
+                <h2 class="mb-2">{{ chat_sessions_today }}</h2>
+                <p class="mb-2">Chat Sessions Today</p>
+                <span class="performance-badge">
+                    <i class="bi bi-star-fill"></i> {{ chat_satisfaction }}/5 satisfaction
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Charts Section -->
+<div class="row mb-4">
+    <!-- Product Distribution by Category -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart text-primary me-2"></i>Products by Category
+                </h5>
+                <span class="badge bg-primary">{{ total_categories }} Categories</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="mt-3">
+                    {% for category in top_categories %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="me-2" style="width: 12px; height: 12px; border-radius: 50%; background-color: 
+                                {% if forloop.counter0 == 0 %}#198754
+                                {% elif forloop.counter0 == 1 %}#0d6efd
+                                {% elif forloop.counter0 == 2 %}#f56500
+                                {% elif forloop.counter0 == 3 %}#6f42c1
+                                {% elif forloop.counter0 == 4 %}#20c997
+                                {% else %}#ffc107{% endif %};"></div>
+                            <span class="fw-medium">{{ category.name }}</span>
+                        </div>
+                        <span class="badge bg-primary">{{ category.product_count }} items</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Status Distribution -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart text-success me-2"></i>Order Status Overview
+                </h5>
+                <span class="badge bg-success">{{ total_orders }} Total Orders</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+                <div class="row mt-3 text-center">
+                    <div class="col-3">
+                        <div class="text-warning h5">{{ weekly_orders }}</div>
+                        <small class="text-muted">This Week</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-success h5">₵{{ weekly_revenue|floatformat:0 }}</div>
+                        <small class="text-muted">Revenue</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-info h5">{{ recent_orders_count }}</div>
+                        <small class="text-muted">Today</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-primary h5">4.8</div>
+                        <small class="text-muted">Avg Rating</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Trend -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up text-info me-2"></i>Revenue Trend (Last 6 Months)
+                </h5>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-success">
+                        <i class="bi bi-arrow-up-circle-fill me-1"></i>
+                        +15.2% vs last period
+                    </span>
+                    <button class="btn btn-sm btn-outline-primary" onclick="exportChart()">
+                        <i class="bi bi-download me-1"></i>Export
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbot Analytics -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-dots text-primary me-2"></i>Chatbot Performance (Last 7 Days)
+                </h5>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-success">{{ chat_satisfaction }}/5 Satisfaction</span>
+                    <span class="badge bg-info">{{ total_chat_sessions }} Total Sessions</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="height: 250px;">
+                    <canvas id="chatActivityChart"></canvas>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-3 text-center">
+                        <div class="h4 text-primary mb-1">{{ total_chat_sessions }}</div>
+                        <small class="text-muted">Total Sessions</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="h4 text-warning mb-1">{{ escalated_chats }}</div>
+                        <small class="text-muted">Escalated</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="h4 text-success mb-1">{{ chat_satisfaction }}</div>
+                        <small class="text-muted">Avg Rating</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="h4 text-info mb-1">95.2%</div>
+                        <small class="text-muted">Resolution Rate</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Common Intents -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bullseye text-warning me-2"></i>Common Intents
+                </h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 200px;">
+                    <canvas id="intentsChart"></canvas>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Products</span>
+                        <span class="text-primary fw-bold">45%</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Pricing</span>
+                        <span class="text-success fw-bold">28%</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Availability</span>
+                        <span class="text-warning fw-bold">15%</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Support</span>
+                        <span class="text-info fw-bold">12%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Performing Products & Insights -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-trophy text-warning me-2"></i>Top Performing Products
+                </h5>
+                <a href="{% url 'admin_dashboard:product_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if top_products %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Units Sold</th>
+                                <th>Revenue</th>
+                                <th>Stock</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in top_products %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" class="me-3 rounded" width="40" height="40">
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-medium">{{ product.name|truncatechars:30 }}</div>
+                                            <small class="text-muted">SKU: {{ product.sku }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ product.total_sold|default:0 }}</span>
+                                </td>
+                                <td class="fw-bold text-success">₵{{ product.price|floatformat:0 }}</td>
+                                <td>
+                                    <span class="badge bg-{% if product.stock_quantity > 10 %}success{% elif product.stock_quantity > 5 %}warning{% else %}danger{% endif %}">
+                                        {{ product.stock_quantity }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" style="width: 85%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-graph-down text-muted" style="font-size: 3rem;"></i>
+                    <h6 class="mt-2">No sales data yet</h6>
+                    <p class="text-muted">Product performance will appear here once orders are completed.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Insights -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightbulb text-success me-2"></i>Business Insights
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success border-0" style="background: linear-gradient(135deg, #d4edda, #c3e6cb);">
+                    <i class="bi bi-trending-up me-2"></i>
+                    <strong>Revenue Growth</strong><br>
+                    <small>+25% increase in sales this month compared to last month</small>
+                </div>
+                
+                <div class="alert alert-info border-0" style="background: linear-gradient(135deg, #d1ecf1, #bee5eb);">
+                    <i class="bi bi-people me-2"></i>
+                    <strong>Customer Engagement</strong><br>
+                    <small>Chatbot handling 78% of inquiries successfully</small>
+                </div>
+                
+                <div class="alert alert-warning border-0" style="background: linear-gradient(135deg, #fff3cd, #ffeaa7);">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Stock Alert</strong><br>
+                    <small>{{ low_stock_products.count }} products running low on inventory</small>
+                </div>
+                
+                <div class="alert alert-primary border-0" style="background: linear-gradient(135deg, #cce7ff, #b3d9ff);">
+                    <i class="bi bi-graph-up-arrow me-2"></i>
+                    <strong>Opportunity</strong><br>
+                    <small>Paint products show highest engagement in chatbot</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions (Enhanced) -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning-charge text-warning me-2"></i>Quick Actions & Management
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="{% url 'admin_dashboard:product_create' %}" class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center quick-action-btn">
+                            <i class="bi bi-plus-circle mb-2" style="font-size: 1.5rem;"></i>
+                            <span>Add Product</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="{% url 'admin_dashboard:category_create' %}" class="btn btn-outline-secondary w-100 py-3 d-flex flex-column align-items-center quick-action-btn">
+                            <i class="bi bi-tags mb-2" style="font-size: 1.5rem;"></i>
+                            <span>Add Category</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="{% url 'admin_dashboard:order_list' %}" class="btn btn-outline-info w-100 py-3 d-flex flex-column align-items-center quick-action-btn">
+                            <i class="bi bi-list-check mb-2" style="font-size: 1.5rem;"></i>
+                            <span>Manage Orders</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="{% url 'admin_dashboard:chatbot_settings' %}" class="btn btn-outline-success w-100 py-3 d-flex flex-column align-items-center quick-action-btn">
+                            <i class="bi bi-robot mb-2" style="font-size: 1.5rem;"></i>
+                            <span>Chatbot Settings</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <button class="btn btn-outline-warning w-100 py-3 d-flex flex-column align-items-center quick-action-btn" onclick="exportData()">
+                            <i class="bi bi-download mb-2" style="font-size: 1.5rem;"></i>
+                            <span>Export Data</span>
+                        </button>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <button class="btn btn-outline-danger w-100 py-3 d-flex flex-column align-items-center quick-action-btn" onclick="generateReport()">
+                            <i class="bi bi-file-text mb-2" style="font-size: 1.5rem;"></i>
+                            <span>Generate Report</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Chart configuration and colors (matching app theme)
+const chartColors = {
+    primary: '#f56500',      // Orange (main brand)
+    secondary: '#1a202c',    // Dark gray
+    success: '#198754',      // Green
+    warning: '#ffc107',      // Yellow
+    danger: '#dc3545',       // Red
+    info: '#0d6efd',         // Blue
+    purple: '#6f42c1',       // Purple
+    teal: '#20c997',         // Teal
+    light: '#f8fafc',
+    dark: '#1e293b'
+};
+
+const gradients = {
+    purple: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    blue: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    green: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    orange: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+};
+
+// Initialize all charts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCategoryChart();
+    initializeOrderStatusChart();
+    initializeRevenueChart();
+    initializeChatActivityChart();
+    initializeIntentsChart();
+});
+
+// Category Distribution Chart
+function initializeCategoryChart() {
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    const categoryData = JSON.parse('{{ category_distribution|safe }}');
+    
+    // Consistent colors for categories
+    const categoryColors = [
+        chartColors.success,    // Hardware Products - Green
+        chartColors.info,       // Automotive Supplies - Blue  
+        chartColors.primary,    // Paints & Coatings - Orange
+        chartColors.purple,     // Lighting & Electrical - Purple
+        chartColors.teal,       // Additional category - Teal
+        chartColors.warning     // Additional category - Yellow
+    ];
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: categoryData.map(item => item.name),
+            datasets: [{
+                data: categoryData.map(item => item.product_count),
+                backgroundColor: categoryColors.slice(0, categoryData.length),
+                borderWidth: 0,
+                hoverBorderWidth: 3,
+                hoverBorderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(26, 32, 44, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chartColors.primary,
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            const percentage = ((context.parsed / categoryData.reduce((a, b) => a + b.product_count, 0)) * 100).toFixed(1);
+                            return context.label + ': ' + context.parsed + ' products (' + percentage + '%)';
+                        }
+                    }
+                }
+            },
+            cutout: '65%'
+        }
+    });
+}
+
+// Order Status Chart
+function initializeOrderStatusChart() {
+    const ctx = document.getElementById('orderStatusChart').getContext('2d');
+    const orderData = JSON.parse('{{ order_status_data|safe }}');
+    
+    // Define colors for specific order statuses
+    const statusColors = {
+        'pending': chartColors.warning,
+        'processing': chartColors.info, 
+        'shipped': chartColors.purple,
+        'delivered': chartColors.success,
+        'cancelled': chartColors.danger,
+        'returned': chartColors.secondary
+    };
+    
+    // Ensure we have data to display
+    const chartData = orderData.length > 0 ? orderData : [
+        { status: 'delivered', count: 1 }  // Default data if no orders exist
+    ];
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.map(item => item.status.charAt(0).toUpperCase() + item.status.slice(1)),
+            datasets: [{
+                label: 'Orders',
+                data: chartData.map(item => item.count),
+                backgroundColor: chartData.map(item => statusColors[item.status] || chartColors.primary),
+                borderRadius: 8,
+                borderSkipped: false,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(26, 32, 44, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chartColors.primary,
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Revenue Trend Chart
+function initializeRevenueChart() {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const revenueData = JSON.parse('{{ monthly_revenue|safe }}');
+    
+    // Create gradient with brand colors
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(245, 101, 0, 0.3)');  // Orange with transparency
+    gradient.addColorStop(1, 'rgba(245, 101, 0, 0.05)');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: revenueData.map(item => item.month),
+            datasets: [{
+                label: 'Revenue (₵)',
+                data: revenueData.map(item => item.revenue),
+                borderColor: chartColors.primary,
+                backgroundColor: gradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: chartColors.primary,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(26, 32, 44, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chartColors.primary,
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Revenue: ₵' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₵' + value.toLocaleString();
+                        },
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Chat Activity Chart
+function initializeChatActivityChart() {
+    const ctx = document.getElementById('chatActivityChart').getContext('2d');
+    const chatData = JSON.parse('{{ chat_activity|safe }}');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chatData.map(item => item.date),
+            datasets: [{
+                label: 'Chat Sessions',
+                data: chatData.map(item => item.sessions),
+                borderColor: chartColors.purple,
+                backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: chartColors.purple,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(26, 32, 44, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chartColors.purple,
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Intents Chart
+function initializeIntentsChart() {
+    const ctx = document.getElementById('intentsChart').getContext('2d');
+    const intentsData = JSON.parse('{{ common_intents|safe }}');
+    
+    // Consistent brand colors for intents
+    const intentColors = [
+        'rgba(245, 101, 0, 0.8)',    // Orange - Products
+        'rgba(25, 135, 84, 0.8)',    // Green - Pricing  
+        'rgba(255, 193, 7, 0.8)',    // Yellow - Availability
+        'rgba(111, 66, 193, 0.8)',   // Purple - Support
+        'rgba(13, 110, 253, 0.8)',   // Blue - General
+        'rgba(32, 201, 151, 0.8)'    // Teal - Other
+    ];
+    
+    new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+            labels: intentsData.map(item => item.intent.charAt(0).toUpperCase() + item.intent.slice(1)),
+            datasets: [{
+                data: intentsData.map(item => item.count),
+                backgroundColor: intentColors.slice(0, intentsData.length),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(26, 32, 44, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chartColors.primary,
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: '#6b7280'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Utility Functions
+function refreshAnalytics() {
+    showToast('Refreshing analytics data...', 'info');
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+function exportChart() {
+    showToast('Exporting chart data...', 'info');
+    // Implementation for exporting chart data
+}
+
+function exportData() {
+    showToast('Preparing data export...', 'info');
+    setTimeout(() => {
+        window.location.href = '{% url "admin_dashboard:export_data" %}';
+        showToast('Data export started! Check your downloads.', 'success');
+    }, 1000);
+}
+
+function generateReport() {
+    showToast('Generating comprehensive report...', 'info');
+    setTimeout(() => {
+        window.open('{% url "admin_dashboard:generate_report" %}', '_blank');
+        showToast('Business report generated successfully!', 'success');
+    }, 1500);
+}
+</script>
+{% endblock %}

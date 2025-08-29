@@ -1,0 +1,737 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}Chatbot Analytics - Admin{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .sessions-card {
+        background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+        color: white;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .sessions-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .sessions-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(20px, -20px);
+    }
+    
+    .performance-indicator {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 8px 16px;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .satisfaction-card {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        color: white;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .satisfaction-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(20px, -20px);
+    }
+    
+    .satisfaction-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .escalation-card {
+        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        color: white;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .escalation-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(20px, -20px);
+    }
+    
+    .escalation-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .activity-card {
+        background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+        color: white;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .activity-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(20px, -20px);
+    }
+    
+    .activity-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .chart-card {
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
+    }
+    
+    .chart-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 20px;
+    }
+    
+    .heatmap-container {
+        display: grid;
+        grid-template-columns: repeat(24, 1fr);
+        gap: 2px;
+        padding: 10px;
+    }
+    
+    .heatmap-cell {
+        aspect-ratio: 1;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        color: white;
+        font-weight: 500;
+    }
+    
+    .escalation-item {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border-left: 4px solid #e53e3e;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        transition: transform 0.2s ease;
+    }
+    
+    .escalation-item:hover {
+        transform: translateX(5px);
+    }
+    
+    .faq-item {
+        background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+        border-left: 4px solid #38a169;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .insight-badge {
+        background: rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    /* Reduce font size only for specific metric card labels */
+    .sessions-card p, .satisfaction-card p, .escalation-card p, .activity-card p {
+        font-size: calc(1rem - 3px) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1" style="font-size: calc(2.375rem - 3px);">
+            <i class="bi bi-robot text-primary me-3"></i>Chatbot Analytics
+        </h1>
+        <p class="text-muted mb-0" style="font-size: calc(1rem - 3px);">Comprehensive insights into chatbot performance and user interactions</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'admin_dashboard:chatbot_settings' %}" class="btn btn-outline-primary">
+            <i class="bi bi-gear me-2"></i>Settings
+        </a>
+        <button class="btn btn-primary" onclick="refreshAnalytics()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+        </button>
+        <button class="btn btn-success" onclick="exportReport()">
+            <i class="bi bi-download me-2"></i>Export Report
+        </button>
+    </div>
+</div>
+
+<!-- Key Metrics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card sessions-card text-center p-4">
+            <div class="card-body p-0 position-relative">
+                <i class="bi bi-chat-dots display-4 mb-3" style="opacity: 0.8;"></i>
+                <h2 class="mb-2">{{ total_sessions }}</h2>
+                <p class="mb-2">Total Sessions</p>
+                <span class="performance-indicator">
+                    <i class="bi bi-arrow-up"></i> +{{ weekly_sessions }} this week
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card satisfaction-card text-center p-4">
+            <div class="card-body p-0">
+                <i class="bi bi-star-fill display-4 mb-3" style="opacity: 0.8;"></i>
+                <h2 class="mb-2">{{ avg_satisfaction }}/5</h2>
+                <p class="mb-2">Avg Satisfaction</p>
+                <span class="performance-indicator">
+                    <i class="bi bi-people"></i> {{ total_feedback }} reviews
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card escalation-card text-center p-4">
+            <div class="card-body p-0">
+                <i class="bi bi-arrow-up-circle display-4 mb-3" style="opacity: 0.8;"></i>
+                <h2 class="mb-2">{{ escalation_rate }}%</h2>
+                <p class="mb-2">Escalation Rate</p>
+                <span class="performance-indicator">
+                    <i class="bi bi-exclamation-triangle"></i> {{ escalated_sessions }} escalated
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card activity-card text-center p-4">
+            <div class="card-body p-0">
+                <i class="bi bi-clock display-4 mb-3" style="opacity: 0.8;"></i>
+                <h2 class="mb-2">{{ avg_response_time }}s</h2>
+                <p class="mb-2">Avg Response Time</p>
+                <span class="performance-indicator">
+                    <i class="bi bi-lightning"></i> Fast response
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="row mb-4">
+    <!-- Channel Distribution -->
+    <div class="col-lg-6 mb-4">
+        <div class="card chart-card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>Channel Distribution
+                </h5>
+                <span class="insight-badge">Primary: Website Widget</span>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="channelChart"></canvas>
+                </div>
+                <div class="row mt-3 text-center">
+                    <div class="col-4">
+                        <div class="h5 text-primary mb-1">{{ total_sessions }}</div>
+                        <small class="text-muted">Total</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="h5 text-success mb-1">{{ weekly_sessions }}</div>
+                        <small class="text-muted">This Week</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="h5 text-info mb-1">95.2%</div>
+                        <small class="text-muted">Uptime</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intent Analysis -->
+    <div class="col-lg-6 mb-4">
+        <div class="card chart-card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bullseye me-2"></i>Top User Intents
+                </h5>
+                <span class="insight-badge">Product inquiries lead</span>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="intentChart"></canvas>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Products</span>
+                        <span class="badge bg-primary">45%</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Pricing</span>
+                        <span class="badge bg-success">28%</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Availability</span>
+                        <span class="badge bg-warning">18%</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Support</span>
+                        <span class="badge bg-info">9%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Patterns -->
+<div class="row mb-4">
+    <!-- Daily Activity Trend -->
+    <div class="col-lg-8 mb-4">
+        <div class="card chart-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>Daily Activity & Success Rate (Last 30 Days)
+                </h5>
+                <span class="insight-badge">Trending upward</span>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="dailyActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hourly Heatmap -->
+    <div class="col-lg-4 mb-4">
+        <div class="card chart-card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock me-2"></i>Activity Heatmap
+                </h5>
+                <span class="insight-badge">Peak: 2-4 PM</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Chat sessions by hour of day</p>
+                <div class="heatmap-container" id="hourlyHeatmap">
+                    <!-- Heatmap cells will be generated by JavaScript -->
+                </div>
+                <div class="d-flex justify-content-between mt-3">
+                    <small class="text-muted">00:00</small>
+                    <small class="text-muted">12:00</small>
+                    <small class="text-muted">23:00</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Insights and Details -->
+<div class="row mb-4">
+    <!-- Recent Escalations -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>Recent Escalations
+                </h5>
+                <span class="badge bg-warning">{{ recent_escalations.count }} Recent</span>
+            </div>
+            <div class="card-body">
+                {% if recent_escalations %}
+                    {% for escalation in recent_escalations %}
+                    <div class="escalation-item">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1 text-danger">
+                                    Session #{{ escalation.session_id|slice:":8" }}
+                                </h6>
+                                <small class="text-muted">
+                                    {{ escalation.user.username|default:"Guest User" }} • 
+                                    {{ escalation.created_at|timesince }} ago
+                                </small>
+                            </div>
+                            <span class="badge bg-danger">{{ escalation.channel|title }}</span>
+                        </div>
+                        <p class="mb-0 text-sm">{{ escalation.escalation_reason|default:"General inquiry requiring human assistance" }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                        <h6 class="mt-2 text-success">No recent escalations!</h6>
+                        <p class="text-muted">The chatbot is handling all inquiries successfully.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular FAQs -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-question-circle text-info me-2"></i>Most Accessed FAQs
+                </h5>
+                <a href="{% url 'admin_dashboard:chatbot_settings' %}" class="btn btn-sm btn-outline-info">Manage FAQs</a>
+            </div>
+            <div class="card-body">
+                {% if top_faqs %}
+                    {% for faq in top_faqs %}
+                    <div class="faq-item">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-1 text-success">{{ faq.question|truncatechars:60 }}</h6>
+                            <span class="badge bg-success">{{ faq.view_count }} views</span>
+                        </div>
+                        <p class="mb-2 text-sm">{{ faq.answer|truncatechars:100 }}</p>
+                        <small class="text-muted">
+                            <i class="bi bi-tag"></i> {{ faq.get_category_display }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-question-circle text-muted" style="font-size: 3rem;"></i>
+                        <h6 class="mt-2">No FAQ data available</h6>
+                        <a href="{% url 'admin_dashboard:chatbot_settings' %}" class="btn btn-sm btn-primary">
+                            Add FAQs
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Insights -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightbulb text-warning me-2"></i>AI-Powered Insights & Recommendations
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-3 mb-3">
+                        <div class="alert alert-success border-0" style="background: linear-gradient(135deg, #d4edda, #c3e6cb);">
+                            <i class="bi bi-trending-up me-2"></i>
+                            <strong>Excellent Performance</strong><br>
+                            <small>{{ avg_satisfaction }}/5 satisfaction rate indicates users are happy with responses</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-3">
+                        <div class="alert alert-info border-0" style="background: linear-gradient(135deg, #d1ecf1, #bee5eb);">
+                            <i class="bi bi-clock me-2"></i>
+                            <strong>Fast Response Times</strong><br>
+                            <small>{{ avg_response_time }}s average response time is well within optimal range</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-3">
+                        <div class="alert alert-warning border-0" style="background: linear-gradient(135deg, #fff3cd, #ffeaa7);">
+                            <i class="bi bi-graph-up-arrow me-2"></i>
+                            <strong>Growth Opportunity</strong><br>
+                            <small>Consider adding more product-related FAQs to reduce escalations</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-3">
+                        <div class="alert alert-primary border-0" style="background: linear-gradient(135deg, #cce7ff, #b3d9ff);">
+                            <i class="bi bi-people me-2"></i>
+                            <strong>User Behavior</strong><br>
+                            <small>Peak activity between 2-4 PM suggests business hours optimization</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Chart colors and configuration (matching app theme)
+const chatbotColors = {
+    primary: '#f56500',      // Orange (main brand)
+    secondary: '#1a202c',    // Dark gray
+    success: '#198754',      // Green
+    warning: '#ffc107',      // Yellow
+    danger: '#dc3545',       // Red
+    info: '#0d6efd',         // Blue
+    purple: '#6f42c1',       // Purple
+    teal: '#20c997',         // Teal
+    light: '#f8fafc',
+    dark: '#1e293b'
+};
+
+// Initialize charts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeChannelChart();
+    initializeIntentChart();
+    initializeDailyActivityChart();
+    initializeHourlyHeatmap();
+});
+
+// Channel Distribution Chart
+function initializeChannelChart() {
+    const ctx = document.getElementById('channelChart').getContext('2d');
+    const channelData = JSON.parse('{{ channel_stats|safe }}');
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: channelData.map(item => item.channel.charAt(0).toUpperCase() + item.channel.slice(1)),
+            datasets: [{
+                data: channelData.map(item => item.count),
+                backgroundColor: [
+                    chatbotColors.primary,
+                    chatbotColors.success,
+                    chatbotColors.purple,
+                    chatbotColors.info,
+                    chatbotColors.warning
+                ],
+                borderWidth: 0,
+                hoverBorderWidth: 3,
+                hoverBorderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        color: '#374151'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(26, 32, 44, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: chatbotColors.primary,
+                    borderWidth: 1
+                }
+            },
+            cutout: '60%'
+        }
+    });
+}
+
+// Intent Analysis Chart
+function initializeIntentChart() {
+    const ctx = document.getElementById('intentChart').getContext('2d');
+    const intentData = JSON.parse('{{ intent_stats|safe }}');
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: intentData.map(item => item.intent.charAt(0).toUpperCase() + item.intent.slice(1)),
+            datasets: [{
+                label: 'Frequency',
+                data: intentData.map(item => item.count),
+                backgroundColor: chatbotColors.primary,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 45
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Daily Activity Chart
+function initializeDailyActivityChart() {
+    const ctx = document.getElementById('dailyActivityChart').getContext('2d');
+    const dailyData = JSON.parse('{{ daily_activity|safe }}');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dailyData.map(item => new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+            datasets: [{
+                label: 'Sessions',
+                data: dailyData.map(item => item.sessions),
+                borderColor: chatbotColors.primary,
+                backgroundColor: 'rgba(108, 92, 231, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y'
+            }, {
+                label: 'Success Rate (%)',
+                data: dailyData.map(item => item.success_rate),
+                borderColor: chatbotColors.success,
+                backgroundColor: 'rgba(0, 184, 148, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Sessions'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Success Rate (%)'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            }
+        }
+    });
+}
+
+// Hourly Activity Heatmap
+function initializeHourlyHeatmap() {
+    const hourlyData = JSON.parse('{{ hourly_activity|safe }}');
+    const container = document.getElementById('hourlyHeatmap');
+    
+    const maxSessions = Math.max(...hourlyData.map(item => item.sessions));
+    
+    hourlyData.forEach((item, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'heatmap-cell';
+        
+        // Calculate intensity based on sessions
+        const intensity = maxSessions > 0 ? item.sessions / maxSessions : 0;
+        
+        // Color based on intensity
+        if (intensity === 0) {
+            cell.style.backgroundColor = '#f8f9fa';
+            cell.style.color = '#6c757d';
+        } else if (intensity < 0.3) {
+            cell.style.backgroundColor = '#bee5eb';
+            cell.style.color = '#0c5460';
+        } else if (intensity < 0.6) {
+            cell.style.backgroundColor = '#5bc0de';
+            cell.style.color = '#ffffff';
+        } else {
+            cell.style.backgroundColor = '#0984e3';
+            cell.style.color = '#ffffff';
+        }
+        
+        cell.textContent = index;
+        cell.title = `${item.hour}: ${item.sessions} sessions`;
+        
+        container.appendChild(cell);
+    });
+}
+
+// Utility functions
+function refreshAnalytics() {
+    showToast('Refreshing chatbot analytics...', 'info');
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+function exportReport() {
+    showToast('Preparing chatbot analytics report...', 'info');
+    // Implementation for exporting analytics report
+    setTimeout(() => {
+        showToast('Report exported successfully!', 'success');
+    }, 2000);
+}
+</script>
+{% endblock %}

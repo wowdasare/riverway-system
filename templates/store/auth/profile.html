@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Riverway Company Limited{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-person-circle" style="font-size: 4rem; color: var(--secondary-color);"></i>
+                    </div>
+                    <h5>{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <div class="list-group mt-4">
+                <a href="{% url 'store:profile' %}" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-person me-2"></i>Profile
+                </a>
+                <a href="{% url 'store:order_history' %}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-bag me-2"></i>Order History
+                </a>
+                <a href="{% url 'store:cart' %}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-cart me-2"></i>Shopping Cart
+                </a>
+                <a href="{% url 'store:logout' %}" class="list-group-item list-group-item-action text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-person me-2"></i>Profile Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">First Name</label>
+                            <p class="form-control-plaintext">{{ user.first_name|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Last Name</label>
+                            <p class="form-control-plaintext">{{ user.last_name|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Username</label>
+                            <p class="form-control-plaintext">{{ user.username }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <p class="form-control-plaintext">{{ user.email|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Date Joined</label>
+                            <p class="form-control-plaintext">{{ user.date_joined|date:"F j, Y" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Last Login</label>
+                            <p class="form-control-plaintext">{{ user.last_login|date:"F j, Y g:i A"|default:"Never" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-bag-check mb-2" style="font-size: 2rem; color: var(--secondary-color);"></i>
+                            <h5>{{ user.orders.count }}</h5>
+                            <p class="text-muted mb-0">Total Orders</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-currency-exchange text-success mb-2" style="font-size: 2rem;"></i>
+                            <h5>₵0</h5>
+                            <p class="text-muted mb-0">Total Spent</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-star text-warning mb-2" style="font-size: 2rem;"></i>
+                            <h5>Premium</h5>
+                            <p class="text-muted mb-0">Member Status</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

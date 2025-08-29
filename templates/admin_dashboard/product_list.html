@@ -1,0 +1,430 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}Products - Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #f56500;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-header h1 i {
+        color: #f56500;
+    }
+    
+    .filter-card, .content-card {
+        background: white;
+        border-radius: 15px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .filter-card:hover, .content-card:hover {
+        border-color: rgba(245, 101, 0, 0.2);
+        box-shadow: 0 8px 25px rgba(245, 101, 0, 0.15);
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #f56500;
+        box-shadow: 0 0 0 0.2rem rgba(245, 101, 0, 0.1);
+        background: white;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #f56500 0%, #fd7e14 100%);
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(245, 101, 0, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(245, 101, 0, 0.4);
+        background: linear-gradient(135deg, #e55d00 0%, #f56d0f 100%);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #e2e8f0;
+        color: #6c757d;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #f56500;
+        border-color: #f56500;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .table th {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border-bottom: 2px solid #f56500;
+    }
+    
+    .table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    
+    .table tbody tr:hover {
+        background: rgba(245, 101, 0, 0.05);
+        transform: translateY(-1px);
+        transition: all 0.2s ease;
+    }
+    
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    
+    .badge.bg-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+    
+    .badge.bg-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    }
+    
+    .badge.bg-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+    }
+    
+    .btn-outline-primary {
+        border-color: #f56500;
+        color: #f56500;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #f56500;
+        border-color: #f56500;
+        color: white;
+    }
+    
+    .btn-outline-danger {
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+    
+    .btn-outline-danger:hover {
+        background: #ef4444;
+        border-color: #ef4444;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h4 {
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #9ca3af;
+        margin-bottom: 2rem;
+    }
+    
+    .pagination .page-link {
+        color: #f56500 !important;
+        border-color: #e2e8f0;
+        padding: 0.5rem 1rem;
+        margin: 0 0.25rem;
+        border-radius: 8px;
+        background: white;
+        text-decoration: none;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #f56500 0%, #fd7e14 100%) !important;
+        border-color: #f56500;
+        color: white !important;
+    }
+    
+    .pagination .page-link:hover {
+        background: rgba(245, 101, 0, 0.1) !important;
+        border-color: #f56500;
+        color: #f56500 !important;
+        text-decoration: none;
+    }
+    
+    .product-image {
+        width: 45px;
+        height: 45px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .image-placeholder {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #e2e8f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1>
+                <i class="bi bi-box-seam me-2"></i>Products
+            </h1>
+            <p class="mb-0 opacity-90">
+                Manage your product inventory and details
+            </p>
+        </div>
+        <a href="{% url 'admin_dashboard:product_create' %}" class="btn btn-outline-light">
+            <i class="bi bi-plus-circle me-2"></i>Add Product
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card filter-card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="search" 
+                       value="{{ search_query }}" placeholder="Search products...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" 
+                            {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    <option value="low_stock" {% if selected_status == 'low_stock' %}selected{% endif %}>Low Stock</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-secondary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="card content-card">
+    <div class="card-body">
+        {% if page_obj.object_list %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>SKU</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in page_obj.object_list %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" class="product-image me-3" alt="{{ product.name }}">
+                                    {% else %}
+                                        <div class="image-placeholder me-3">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ product.name|truncatechars:40 }}</strong>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ product.category.name }}</td>
+                            <td><code>{{ product.sku }}</code></td>
+                            <td>₵{{ product.price }} / {{ product.get_unit_display }}</td>
+                            <td>
+                                {% if product.stock_quantity <= 10 %}
+                                    <span class="badge bg-warning">{{ product.stock_quantity }}</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ product.stock_quantity }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if product.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'store:product_detail' product.pk %}" 
+                                       class="btn btn-outline-primary" target="_blank">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'admin_dashboard:product_edit' product.pk %}" 
+                                       class="btn btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button onclick="deleteProduct({{ product.pk }}, '{{ product.name|escapejs }}')" 
+                                            class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&category={{ selected_category }}&status={{ selected_status }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&category={{ selected_category }}&status={{ selected_status }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-box-seam"></i>
+                <h4>No products found</h4>
+                <p>Try adjusting your search criteria or add your first product to get started.</p>
+                <a href="{% url 'admin_dashboard:product_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Add First Product
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function deleteProduct(productId, productName) {
+    showConfirmDialog(
+        'Are you sure?',
+        `You won't be able to revert this! Product "${productName}" will be permanently deleted.`,
+        'Yes, delete it!',
+        function() {
+            // Create a form and submit it
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin-dashboard/products/${productId}/delete/`;
+            
+            // Add CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken.value;
+                form.appendChild(csrfInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    );
+}
+</script>
+{% endblock %}

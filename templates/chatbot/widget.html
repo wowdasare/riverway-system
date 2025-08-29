@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riverway Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 420px;
+            height: 650px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chat-header .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .status-indicator {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-text {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .product-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #333;
+        }
+        
+        .product-price {
+            color: #e67e22;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        
+        .product-stock {
+            color: #666;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+        
+        .auth-prompt {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .auth-prompt h4 {
+            margin: 0 0 10px 0;
+            color: #856404;
+            font-size: 14px;
+        }
+        
+        .auth-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .auth-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .auth-btn.primary {
+            background: #e67e22;
+            color: white;
+        }
+        
+        .auth-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .user-greeting {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            color: #155724;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-time {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message.bot .message-time {
+            text-align: left;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 16px;
+            background: white;
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+            margin-bottom: 15px;
+            max-width: 80%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-dots {
+            display: flex;
+            align-items: center;
+        }
+
+        .typing-dots span {
+            height: 8px;
+            width: 8px;
+            background: #e67e22;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 25px;
+            padding: 5px;
+            border: 2px solid #e0e0e0;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: #e67e22;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 16px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 12px rgba(231, 126, 34, 0.3);
+        }
+
+        .send-button:hover {
+            transform: scale(1.1);
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .suggestions {
+            padding: 0 20px 15px;
+            background: #f8f9fa;
+        }
+
+        .suggestion-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .suggestion-btn {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+
+        .suggestion-btn:hover {
+            background: #e67e22;
+            color: white;
+            border-color: #e67e22;
+        }
+
+        .feedback-section {
+            padding: 15px 20px;
+            background: #fff3cd;
+            border-top: 1px solid #e0e0e0;
+            display: none;
+        }
+
+        .feedback-section.show {
+            display: block;
+        }
+
+        .feedback-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .star {
+            color: #ddd;
+            cursor: pointer;
+            font-size: 20px;
+            transition: color 0.2s ease;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #ffc107;
+        }
+
+        .feedback-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 60px;
+            font-size: 12px;
+        }
+
+        .feedback-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .feedback-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .feedback-btn.primary {
+            background: #e67e22;
+            color: white;
+        }
+
+        .feedback-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 480px) {
+            .chat-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                margin: 0;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .product-card {
+                padding: 8px;
+            }
+            
+            .product-image {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .suggestion-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .suggestion-btn {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-container {
+                width: 100%;
+                height: 100vh;
+            }
+        }
+
+        /* Scroll styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #e67e22;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .message.bot .message-content {
+            position: relative;
+        }
+        
+        .quick-reply {
+            display: inline-block;
+            background: #e67e22;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin: 2px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .quick-reply:hover {
+            background: #d35400;
+        }
+        
+        .system-message {
+            background: #e8f4f8;
+            color: #2c3e50;
+            font-style: italic;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 15px;
+            margin: 10px auto;
+            font-size: 12px;
+            max-width: 90%;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h3>Riverway Assistant</h3>
+            <div class="subtitle">Online • Usually replies instantly</div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+            </div>
+        </div>
+        
+        <div class="suggestions">
+            <div class="suggestion-buttons">
+                <button class="suggestion-btn" onclick="sendSuggestion('Show me your products')">Products</button>
+                <button class="suggestion-btn" onclick="sendSuggestion('What are your business hours?')">Hours</button>
+                <button class="suggestion-btn" onclick="sendSuggestion('Where are you located?')">Location</button>
+                <button class="suggestion-btn" onclick="sendSuggestion('What services do you offer?')">Services</button>
+                <button class="suggestion-btn" onclick="sendSuggestion('Contact information')">Contact</button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <!-- Auth prompt will be inserted here for non-authenticated users -->
+            <div class="message bot">
+                <div class="message-content">
+                    {% if settings %}
+                        {{ settings.welcome_message }}
+                    {% else %}
+                        Welcome to Riverway Company! I'm here to help you with any questions about our services, hours, location, products, or anything else you need to know. How can I assist you today?
+                    {% endif %}
+                    <div class="message-time" id="welcomeTime"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="feedback-section" id="feedbackSection">
+            <div class="feedback-title">How was your experience?</div>
+            <div class="rating-stars" id="ratingStars">
+                <span class="star" data-rating="1">★</span>
+                <span class="star" data-rating="2">★</span>
+                <span class="star" data-rating="3">★</span>
+                <span class="star" data-rating="4">★</span>
+                <span class="star" data-rating="5">★</span>
+            </div>
+            <textarea class="feedback-input" id="feedbackInput" placeholder="Tell us about your experience (optional)"></textarea>
+            <div class="feedback-buttons">
+                <button class="feedback-btn primary" onclick="submitFeedback()">Submit</button>
+                <button class="feedback-btn secondary" onclick="hideFeedback()">Skip</button>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <div class="input-group">
+                <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sessionId = '{{ session_id }}';
+        let messageCount = 0;
+        let selectedRating = 0;
+        let userAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+        let userName = '{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% endif %}';
+        let guestName = localStorage.getItem('guestName') || '';
+
+        // Initialize welcome time
+        document.getElementById('welcomeTime').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        // Show auth prompt if not authenticated and no guest name
+        if (!userAuthenticated && !guestName) {
+            showAuthPrompt();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendSuggestion(message) {
+            document.getElementById('messageInput').value = message;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            const sendButton = document.getElementById('sendButton');
+            sendButton.disabled = true;
+            sendButton.innerHTML = '<div class="loading-spinner"></div>';
+
+            // Add user message to chat
+            addMessage('user', message);
+            input.value = '';
+
+            // Show typing indicator
+            showTyping();
+
+            try {
+                const response = await fetch('/chatbot/api/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        channel: 'website'
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Hide typing indicator
+                hideTyping();
+
+                if (data.status === 'success') {
+                    // Add bot response
+                    addMessage('bot', data.response);
+                    
+                    // Display products if provided
+                    if (data.products && data.products.length > 0) {
+                        displayProducts(data.products);
+                    }
+                    
+                    // Update suggestions if provided
+                    if (data.suggested_actions && data.suggested_actions.length > 0) {
+                        updateSuggestions(data.suggested_actions);
+                    }
+
+                    // Show escalation notice if escalated
+                    if (data.escalated) {
+                        addMessage('system', 'Your conversation has been forwarded to one of our team members who will assist you shortly.');
+                    }
+                    
+                    // Update user authentication status
+                    if (data.user_authenticated !== undefined) {
+                        userAuthenticated = data.user_authenticated;
+                        if (data.username) {
+                            userName = data.username;
+                        }
+                    }
+
+                    messageCount++;
+                    
+                    // Show feedback after 3 messages
+                    if (messageCount >= 3) {
+                        setTimeout(() => showFeedback(), 2000);
+                    }
+                } else {
+                    addMessage('bot', data.response || 'Sorry, I encountered an error. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                hideTyping();
+                addMessage('bot', 'Sorry, I encountered a connection error. Please try again.');
+            }
+
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/></svg>';
+        }
+
+        function addMessage(type, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Personalize greeting messages
+            if (type === 'bot' && content.toLowerCase().includes('welcome')) {
+                const displayName = userName || guestName;
+                if (displayName && !content.toLowerCase().includes('hello ' + displayName.toLowerCase())) {
+                    content = `Hello ${displayName}! ` + content;
+                }
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${content}
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            typingIndicator.style.display = 'block';
+            messagesContainer.appendChild(typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            typingIndicator.style.display = 'none';
+        }
+
+        function updateSuggestions(actions) {
+            const suggestionsMap = {
+                'show_more_products': 'Show me more products',
+                'show_popular_products': 'Show popular products',
+                'browse_products': 'Browse all products',
+                'browse_categories': 'Browse by category',
+                'ask_services': 'What services do you offer?',
+                'ask_hours': 'What are your business hours?',
+                'ask_location': 'Where are you located?',
+                'get_quote': 'Can I get a quote?',
+                'get_bulk_quote': 'Get bulk pricing quote',
+                'contact_sales': 'Contact sales team',
+                'contact_support': 'Contact customer support',
+                'call_company': 'How can I contact you?',
+                'check_availability': 'Check product availability',
+                'ask_human_help': 'I need to speak to someone'
+            };
+
+            const suggestionsContainer = document.querySelector('.suggestion-buttons');
+            suggestionsContainer.innerHTML = '';
+
+            actions.slice(0, 4).forEach(action => {
+                if (suggestionsMap[action]) {
+                    const button = document.createElement('button');
+                    button.className = 'suggestion-btn';
+                    button.textContent = suggestionsMap[action];
+                    button.onclick = () => sendSuggestion(suggestionsMap[action]);
+                    suggestionsContainer.appendChild(button);
+                }
+            });
+        }
+
+        function showFeedback() {
+            const feedbackSection = document.getElementById('feedbackSection');
+            feedbackSection.classList.add('show');
+        }
+
+        function hideFeedback() {
+            const feedbackSection = document.getElementById('feedbackSection');
+            feedbackSection.classList.remove('show');
+        }
+
+        // Rating system
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+                updateStars();
+            });
+            
+            star.addEventListener('mouseover', function() {
+                const rating = parseInt(this.dataset.rating);
+                updateStars(rating);
+            });
+        });
+
+        document.getElementById('ratingStars').addEventListener('mouseleave', function() {
+            updateStars(selectedRating);
+        });
+
+        function updateStars(rating = selectedRating) {
+            document.querySelectorAll('.star').forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        async function submitFeedback() {
+            const feedback = document.getElementById('feedbackInput').value;
+            
+            try {
+                const response = await fetch('/chatbot/feedback/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        rating: selectedRating,
+                        feedback: feedback,
+                        was_helpful: selectedRating >= 3
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    addMessage('system', 'Thank you for your feedback! We really appreciate it.');
+                }
+            } catch (error) {
+                console.error('Feedback error:', error);
+            }
+            
+            hideFeedback();
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function showAuthPrompt() {
+            const authPrompt = document.createElement('div');
+            authPrompt.className = 'auth-prompt';
+            authPrompt.id = 'authPrompt';
+            authPrompt.innerHTML = `
+                <h4>Welcome to Riverway Company! To provide better assistance, may I know your name?</h4>
+                <input type="text" class="auth-input" id="guestNameInput" placeholder="Enter your first name" maxlength="50">
+                <div class="auth-buttons">
+                    <button class="auth-btn primary" onclick="setGuestName()">Continue</button>
+                    <button class="auth-btn secondary" onclick="skipAuth()">Skip</button>
+                </div>
+            `;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.insertBefore(authPrompt, messagesContainer.firstChild);
+            document.getElementById('guestNameInput').focus();
+        }
+        
+        function setGuestName() {
+            const nameInput = document.getElementById('guestNameInput');
+            const name = nameInput.value.trim();
+            
+            if (name.length < 1) {
+                alert('Please enter your name or click Skip');
+                return;
+            }
+            
+            guestName = name;
+            localStorage.setItem('guestName', guestName);
+            
+            // Remove auth prompt
+            const authPrompt = document.getElementById('authPrompt');
+            if (authPrompt) {
+                authPrompt.remove();
+            }
+            
+            // Show greeting with name
+            const greeting = document.createElement('div');
+            greeting.className = 'user-greeting';
+            greeting.innerHTML = `Nice to meet you, ${guestName}! I'm here to help you with our products and services.`;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.insertBefore(greeting, messagesContainer.children[0]);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            document.getElementById('messageInput').focus();
+        }
+        
+        function skipAuth() {
+            const authPrompt = document.getElementById('authPrompt');
+            if (authPrompt) {
+                authPrompt.remove();
+            }
+            document.getElementById('messageInput').focus();
+        }
+        
+        function displayProducts(products) {
+            if (!products || products.length === 0) return;
+            
+            const productGrid = document.createElement('div');
+            productGrid.className = 'product-grid';
+            
+            products.slice(0, 6).forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.onclick = () => sendSuggestion(`Tell me more about ${product.name}`);
+                
+                const imageUrl = product.image ? `/media/${product.image}` : '/static/images/no-product.png';
+                const stockStatus = product.stock_quantity > 0 ? `${product.stock_quantity} in stock` : 'Out of stock';
+                const stockColor = product.stock_quantity > 0 ? '#28a745' : '#dc3545';
+                
+                productCard.innerHTML = `
+                    <img src="${imageUrl}" alt="${product.name}" class="product-image" onerror="this.src='/static/images/no-product.png'">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">₵${parseFloat(product.price).toFixed(2)}/${product.unit}</div>
+                    <div class="product-stock" style="color: ${stockColor}">${stockStatus}</div>
+                `;
+                
+                productGrid.appendChild(productCard);
+            });
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.appendChild(productGrid);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Handle Enter key in guest name input
+        document.addEventListener('keypress', function(event) {
+            if (event.target.id === 'guestNameInput' && event.key === 'Enter') {
+                setGuestName();
+            }
+        });
+        
+        // Auto-focus input and add intelligent message suggestions
+        document.getElementById('messageInput').focus();
+        
+        // Add intelligent input suggestions
+        const inputSuggestions = [
+            'Show me your products',
+            'What products do you have?',
+            'I need cement and steel',
+            'What are your prices?',
+            'Do you deliver?',
+            'What are your business hours?',
+            'Where are you located?'
+        ];
+        
+        let suggestionIndex = 0;
+        const messageInput = document.getElementById('messageInput');
+        
+        // Cycle through placeholder suggestions every 3 seconds
+        setInterval(() => {
+            if (!messageInput.value && document.activeElement !== messageInput) {
+                messageInput.placeholder = inputSuggestions[suggestionIndex];
+                suggestionIndex = (suggestionIndex + 1) % inputSuggestions.length;
+            }
+        }, 3000);
+        
+        // Reset placeholder when focused
+        messageInput.addEventListener('focus', () => {
+            messageInput.placeholder = 'Type your message...';
+        });
+    </script>
+</body>
+</html>

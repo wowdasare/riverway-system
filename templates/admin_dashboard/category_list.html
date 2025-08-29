@@ -1,0 +1,258 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}Categories - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #f56500;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-header h1 i {
+        color: #f56500;
+    }
+    
+    .content-card {
+        background: white;
+        border-radius: 15px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .content-card:hover {
+        border-color: rgba(245, 101, 0, 0.2);
+        box-shadow: 0 8px 25px rgba(245, 101, 0, 0.15);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #f56500 0%, #fd7e14 100%);
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(245, 101, 0, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(245, 101, 0, 0.4);
+        background: linear-gradient(135deg, #e55d00 0%, #f56d0f 100%);
+    }
+    
+    .table th {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border-bottom: 2px solid #f56500;
+    }
+    
+    .table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    
+    .table tbody tr:hover {
+        background: rgba(245, 101, 0, 0.05);
+        transform: translateY(-1px);
+        transition: all 0.2s ease;
+    }
+    
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    
+    .badge.bg-info {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+    }
+    
+    .btn-outline-primary {
+        border-color: #f56500;
+        color: #f56500;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #f56500;
+        border-color: #f56500;
+        color: white;
+    }
+    
+    .btn-outline-info {
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+    
+    .btn-outline-info:hover {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h4 {
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #9ca3af;
+        margin-bottom: 2rem;
+    }
+    
+    .category-image {
+        width: 45px;
+        height: 45px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .image-placeholder {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #e2e8f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1>
+                <i class="bi bi-tags me-2"></i>Categories
+            </h1>
+            <p class="mb-0 opacity-90">
+                Organize your products into categories
+            </p>
+        </div>
+        <a href="{% url 'admin_dashboard:category_create' %}" class="btn btn-outline-light">
+            <i class="bi bi-plus-circle me-2"></i>Add Category
+        </a>
+    </div>
+</div>
+
+<div class="card content-card">
+    <div class="card-body">
+        {% if categories %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Products</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if category.image %}
+                                        <img src="{{ category.image.url }}" class="category-image me-3" alt="{{ category.name }}">
+                                    {% else %}
+                                        <div class="image-placeholder me-3">
+                                            <i class="bi bi-tag text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ category.name }}</strong>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {{ category.description|truncatechars:60|default:"No description provided" }}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ category.product_count }} products</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'admin_dashboard:category_edit' category.pk %}" 
+                                       class="btn btn-outline-primary" title="Edit Category">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'admin_dashboard:product_list' %}?category={{ category.id }}" 
+                                       class="btn btn-outline-info" title="View Products">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-tags"></i>
+                <h4>No categories yet</h4>
+                <p>Create your first product category to organize your inventory and make it easier for customers to find products.</p>
+                <a href="{% url 'admin_dashboard:category_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Add First Category
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

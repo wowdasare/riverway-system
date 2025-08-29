@@ -1,0 +1,765 @@
+<!-- Riverway Chatbot Embedded Widget -->
+<style>
+    .riverway-chatbot {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .chatbot-toggle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(102, 126, 234, 0.7);
+        }
+        70% {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 10px rgba(102, 126, 234, 0);
+        }
+        100% {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(102, 126, 234, 0);
+        }
+    }
+
+    .chatbot-toggle:hover {
+        transform: scale(1.1);
+        animation: none;
+    }
+
+    .chatbot-toggle.active {
+        animation: none;
+    }
+
+    .chatbot-window {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 350px;
+        height: 500px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .chatbot-window.show {
+        display: flex;
+    }
+
+    .chatbot-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 18px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        min-height: 60px;
+    }
+
+    .chatbot-header h4 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .chatbot-header .subtitle {
+        font-size: 11px;
+        opacity: 0.9;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.3s ease;
+    }
+
+    .close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .chatbot-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .chatbot-message {
+        display: flex;
+        animation: fadeInUp 0.3s ease;
+    }
+
+    .chatbot-message.user {
+        justify-content: flex-end;
+    }
+
+    .chatbot-message.bot {
+        justify-content: flex-start;
+    }
+
+    .message-bubble {
+        max-width: 80%;
+        padding: 10px 12px;
+        border-radius: 15px;
+        font-size: 13px;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+
+    .chatbot-message.user .message-bubble {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .chatbot-message.bot .message-bubble {
+        background: white;
+        color: #333;
+        border: 1px solid #e0e0e0;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .typing-indicator {
+        display: none;
+        padding: 10px 12px;
+        background: white;
+        border-radius: 15px;
+        border-bottom-left-radius: 4px;
+        max-width: 80%;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+    }
+
+    .typing-dots {
+        display: flex;
+        align-items: center;
+    }
+
+    .typing-dots span {
+        height: 6px;
+        width: 6px;
+        background: #667eea;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 3px;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    .chatbot-input {
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .chatbot-input input {
+        flex: 1;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        padding: 10px 15px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+
+    .chatbot-input input:focus {
+        border-color: #667eea;
+    }
+
+    .send-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+    }
+
+    .send-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .send-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .quick-actions {
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .quick-action {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 6px 10px;
+        border-radius: 15px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .quick-action:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ff4444;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 480px) {
+        .riverway-chatbot {
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .chatbot-window {
+            width: calc(100vw - 20px);
+            height: calc(100vh - 100px);
+            bottom: 70px;
+            right: -10px;
+        }
+        
+        .chatbot-header {
+            padding: 15px 16px;
+            min-height: 55px;
+        }
+        
+        .chatbot-header h4 {
+            font-size: 16px;
+        }
+    }
+
+    /* Scroll styling */
+    .chatbot-messages::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .chatbot-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chatbot-messages::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 2px;
+    }
+</style>
+
+<div class="riverway-chatbot" id="riverwayChat">
+    <button class="chatbot-toggle" id="chatToggle" onclick="toggleChat()">
+        <svg id="chatIcon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H18L22 22V4C22 2.9 21.1 2 20 2ZM20 17.17L18.83 16H4V4H20V17.17Z" fill="currentColor"/>
+            <circle cx="8" cy="10" r="1" fill="currentColor"/>
+            <circle cx="12" cy="10" r="1" fill="currentColor"/>
+            <circle cx="16" cy="10" r="1" fill="currentColor"/>
+        </svg>
+        <svg id="closeIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;">
+            <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+        </svg>
+        <div class="notification-badge" id="notificationBadge" style="display: none;">1</div>
+    </button>
+
+    <div class="chatbot-window" id="chatWindow">
+        <div class="chatbot-header">
+            <div>
+                <h4>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                        <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V19C3 20.11 3.89 21 5 21H11V19H5V3H13V9H21ZM14 17C14 14.24 16.24 12 19 12S24 14.24 24 17 21.76 22 19 22 14 19.76 14 17ZM16 17C16 18.66 17.34 20 19 20S22 18.66 22 17 20.66 15 19 15 16 15.34 16 17Z"/>
+                    </svg>
+                    Riverway Assistant
+                </h4>
+                <div class="subtitle">Online • Usually replies instantly</div>
+            </div>
+            <button class="close-btn" onclick="closeChat()">×</button>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-action" onclick="sendQuickMessage('What are your business hours?')">Hours</button>
+            <button class="quick-action" onclick="sendQuickMessage('Where are you located?')">Location</button>
+            <button class="quick-action" onclick="sendQuickMessage('What services do you offer?')">Services</button>
+            <button class="quick-action" onclick="sendQuickMessage('Contact information')">Contact</button>
+        </div>
+
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="chatbot-message bot">
+                <div class="message-bubble">
+                    Welcome to Riverway Company! 👋 I'm here to help you with any questions about our services, hours, location, or anything else you need to know. How can I assist you today?
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="chatbot-input">
+            <input type="text" id="chatInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" id="sendButton" onclick="sendMessage()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let chatOpen = false;
+    let sessionId = generateSessionId();
+    let hasNewMessages = false;
+    let hasShownNotification = sessionStorage.getItem('chatbot_notification_shown') === 'true';
+
+    function generateSessionId() {
+        return 'web_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+    }
+
+    function toggleChat() {
+        if (chatOpen) {
+            closeChat();
+        } else {
+            openChat();
+        }
+    }
+
+    function openChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        const chatIcon = document.getElementById('chatIcon');
+        const closeIcon = document.getElementById('closeIcon');
+        const toggle = document.getElementById('chatToggle');
+        const badge = document.getElementById('notificationBadge');
+        
+        chatWindow.classList.add('show');
+        chatIcon.style.display = 'none';
+        closeIcon.style.display = 'block';
+        toggle.classList.add('active');
+        badge.style.display = 'none';
+        
+        chatOpen = true;
+        hasNewMessages = false;
+        
+        // Reset notification state since user opened the chat
+        hasShownNotification = true;
+        sessionStorage.setItem('chatbot_notification_shown', 'true');
+        
+        // Focus input
+        document.getElementById('chatInput').focus();
+    }
+
+    function closeChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        const chatIcon = document.getElementById('chatIcon');
+        const closeIcon = document.getElementById('closeIcon');
+        const toggle = document.getElementById('chatToggle');
+        
+        chatWindow.classList.remove('show');
+        chatIcon.style.display = 'block';
+        closeIcon.style.display = 'none';
+        toggle.classList.remove('active');
+        
+        chatOpen = false;
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function sendQuickMessage(message) {
+        document.getElementById('chatInput').value = message;
+        sendMessage();
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+
+        const sendButton = document.getElementById('sendButton');
+        sendButton.disabled = true;
+
+        // Add user message
+        addMessage('user', message);
+        input.value = '';
+
+        // Show typing indicator
+        showTyping();
+
+        try {
+            const response = await fetch('/chatbot/api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    message: message,
+                    channel: 'website'
+                })
+            });
+
+            const data = await response.json();
+            
+            hideTyping();
+
+            if (data.status === 'success') {
+                addMessage('bot', data.response, data.products);
+                
+                // Check if bot is collecting name
+                if (data.collecting_name || data.greeting_type === 'new_guest') {
+                    showNameCollectionForm();
+                }
+                
+                if (data.escalated) {
+                    addMessage('bot', 'Your conversation has been forwarded to one of our team members who will assist you shortly.');
+                }
+                
+                // Show notification if chat is closed
+                if (!chatOpen) {
+                    showNotification();
+                }
+            } else {
+                addMessage('bot', data.response || 'Sorry, I encountered an error. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            hideTyping();
+            addMessage('bot', 'Sorry, I encountered a connection error. Please try again.');
+        }
+
+        sendButton.disabled = false;
+    }
+
+    function addMessage(type, content, products = []) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chatbot-message ${type}`;
+        
+        // Format content with markdown support
+        let formattedContent = formatMessage(content);
+        
+        messageDiv.innerHTML = `
+            <div class="message-bubble">${formattedContent}</div>
+        `;
+        
+        // Add product display if products are provided
+        if (products && products.length > 0) {
+            const productContainer = createProductDisplay(products);
+            messageDiv.appendChild(productContainer);
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function formatMessage(content) {
+        // Convert markdown-style formatting to HTML
+        return content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold text
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')  // Italic text
+            .replace(/\n/g, '<br>')  // Line breaks
+            .replace(/• /g, '&bull; ')  // Bullet points
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');  // Links
+    }
+
+    function createProductDisplay(products) {
+        const container = document.createElement('div');
+        container.className = 'products-display';
+        container.style.cssText = `
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        `;
+        
+        products.slice(0, 4).forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.style.cssText = `
+                background: #f8f9fa;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 8px;
+                flex: 1;
+                min-width: 140px;
+                max-width: 160px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+            
+            let imageHtml = '';
+            if (product.image_url) {
+                imageHtml = `<img src="${product.image_url}" alt="${product.name}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 6px;">`;
+            }
+            
+            const stockStatus = product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock';
+            const stockColor = product.stock_quantity > 0 ? '#28a745' : '#dc3545';
+            
+            productCard.innerHTML = `
+                ${imageHtml}
+                <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #333;">${product.name}</div>
+                <div style="font-size: 10px; color: #666; margin-bottom: 4px;">₵${parseFloat(product.price).toFixed(2)} per ${product.unit}</div>
+                <div style="font-size: 9px; color: ${stockColor};">${stockStatus}</div>
+            `;
+            
+            productCard.addEventListener('click', () => {
+                sendQuickMessage(`Tell me more about ${product.name}`);
+            });
+            
+            productCard.addEventListener('mouseover', () => {
+                productCard.style.transform = 'scale(1.02)';
+                productCard.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+            });
+            
+            productCard.addEventListener('mouseout', () => {
+                productCard.style.transform = 'scale(1)';
+                productCard.style.boxShadow = 'none';
+            });
+            
+            container.appendChild(productCard);
+        });
+        
+        return container;
+    }
+
+    function showTyping() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        const messagesContainer = document.getElementById('chatMessages');
+        
+        typingIndicator.style.display = 'block';
+        messagesContainer.appendChild(typingIndicator);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function hideTyping() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        typingIndicator.style.display = 'none';
+    }
+
+    function showNotification() {
+        const badge = document.getElementById('notificationBadge');
+        const toggle = document.getElementById('chatToggle');
+        
+        if (!chatOpen && !hasShownNotification) {
+            badge.style.display = 'flex';
+            hasNewMessages = true;
+            hasShownNotification = true;
+            
+            // Mark notification as shown for this session
+            sessionStorage.setItem('chatbot_notification_shown', 'true');
+            
+            // Add pulse animation
+            toggle.style.animation = 'pulse 1s infinite';
+        }
+    }
+
+    function showNameCollectionForm() {
+        const messagesContainer = document.getElementById('chatMessages');
+        const nameFormDiv = document.createElement('div');
+        nameFormDiv.id = 'nameCollectionForm';
+        nameFormDiv.className = 'name-collection-form';
+        nameFormDiv.style.cssText = `
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            animation: fadeInUp 0.3s ease;
+        `;
+        
+        nameFormDiv.innerHTML = `
+            <div style="margin-bottom: 12px; font-size: 13px; color: #333; font-weight: 600;">Name</div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="guestNameInput" placeholder="Enter your name" style="
+                    flex: 1;
+                    border: 2px solid #667eea;
+                    border-radius: 20px;
+                    padding: 8px 15px;
+                    font-size: 13px;
+                    outline: none;
+                ">
+                <button onclick="submitGuestName()" style="
+                    background: #667eea;
+                    color: white;
+                    border: none;
+                    border-radius: 15px;
+                    padding: 8px 20px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    font-weight: 600;
+                ">Send</button>
+            </div>
+            <div style="margin-top: 8px; font-size: 10px; color: #888;">1 of 1</div>
+        `;
+        
+        messagesContainer.appendChild(nameFormDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Focus on the input
+        document.getElementById('guestNameInput').focus();
+        
+        // Allow Enter key to submit
+        document.getElementById('guestNameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitGuestName();
+            }
+        });
+    }
+
+    async function submitGuestName() {
+        const nameInput = document.getElementById('guestNameInput');
+        const name = nameInput.value.trim();
+        
+        if (!name) return;
+        
+        // Remove the name collection form
+        const nameForm = document.getElementById('nameCollectionForm');
+        if (nameForm) {
+            nameForm.remove();
+        }
+        
+        // Add the name as a user message and send it
+        addMessage('user', name);
+        
+        // Show typing indicator
+        showTyping();
+        
+        try {
+            const response = await fetch('/chatbot/api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    message: name,
+                    channel: 'website'
+                })
+            });
+
+            const data = await response.json();
+            
+            hideTyping();
+
+            if (data.status === 'success') {
+                addMessage('bot', data.response, data.products);
+            } else {
+                addMessage('bot', data.response || 'Sorry, I encountered an error. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            hideTyping();
+            addMessage('bot', 'Sorry, I encountered a connection error. Please try again.');
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Auto-show after 30 seconds if not opened and notification hasn't been shown yet
+    setTimeout(() => {
+        if (!chatOpen && !hasNewMessages && !hasShownNotification) {
+            showNotification();
+        }
+    }, 30000);
+</script>
