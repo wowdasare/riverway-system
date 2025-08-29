@@ -167,7 +167,7 @@ class NLPEngine:
             # Get some alternative suggestions from our actual products
             popular_products = Product.objects.filter(is_active=True, stock_quantity__gt=0).order_by('-stock_quantity')[:4]
             product_list = list(popular_products.values(
-                'id', 'name', 'price', 'image', 'description', 'unit', 'stock_quantity'
+                'id', 'name', 'price', 'image', 'description', 'unit', 'stock_quantity', 'rating', 'rating_count'
             ))
             
             # Add image URLs
@@ -250,7 +250,7 @@ class NLPEngine:
             
             if found_products.exists():
                 product_list = list(found_products.values(
-                    'id', 'name', 'price', 'image', 'description', 'unit', 'stock_quantity'
+                    'id', 'name', 'price', 'image', 'description', 'unit', 'stock_quantity', 'rating', 'rating_count'
                 ))
                 
                 # Add image URLs
@@ -492,7 +492,7 @@ class ChatbotEngine:
                         'products': []
                     }
                 popular_list = list(popular_products.values(
-                    'id', 'name', 'price', 'image', 'description', 'unit', 'stock_quantity'
+                    'id', 'name', 'price', 'image', 'description', 'unit', 'stock_quantity', 'rating', 'rating_count'
                 ))
                 # Add image URLs
                 for product in popular_list:
@@ -516,7 +516,9 @@ class ChatbotEngine:
                     'image': product.image.name if product.image else None,
                     'description': product.description,
                     'unit': product.unit,
-                    'stock_quantity': product.stock_quantity
+                    'stock_quantity': product.stock_quantity,
+                    'rating': float(product.rating),
+                    'rating_count': product.rating_count
                 }
                 product_list.append(product_dict)
             

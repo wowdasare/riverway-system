@@ -964,10 +964,29 @@
                 const stockStatus = product.stock_quantity > 0 ? `${product.stock_quantity} in stock` : 'Out of stock';
                 const stockColor = product.stock_quantity > 0 ? '#28a745' : '#dc3545';
                 
+                // Generate star rating display
+                const rating = parseFloat(product.rating) || 0;
+                const ratingCount = product.rating_count || 0;
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= rating) {
+                        starsHtml += '<span style="color: #ffc107;">★</span>';
+                    } else if (i - 0.5 <= rating) {
+                        starsHtml += '<span style="color: #ffc107;">☆</span>';
+                    } else {
+                        starsHtml += '<span style="color: #ddd;">☆</span>';
+                    }
+                }
+                const ratingText = ratingCount > 0 ? `${rating.toFixed(1)} (${ratingCount})` : 'No ratings';
+                
                 productCard.innerHTML = `
                     <img src="${imageUrl}" alt="${product.name}" class="product-image" onerror="this.src='/static/images/no-product.png'">
                     <div class="product-name">${product.name}</div>
                     <div class="product-price">₵${parseFloat(product.price).toFixed(2)}/${product.unit}</div>
+                    <div class="product-rating" style="font-size: 10px; margin: 2px 0;">
+                        ${starsHtml}
+                        <div style="color: #666; font-size: 9px;">${ratingText}</div>
+                    </div>
                     <div class="product-stock" style="color: ${stockColor}">${stockStatus}</div>
                 `;
                 

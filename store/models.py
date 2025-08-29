@@ -38,6 +38,8 @@ class Product(models.Model):
     stock_quantity = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     specifications = models.JSONField(default=dict, blank=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00, help_text="Product rating out of 5")
+    rating_count = models.PositiveIntegerField(default=0, help_text="Number of ratings")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
